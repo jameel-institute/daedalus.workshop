@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(ji.rpkg.template)
+library(daedalus.workshop)
 ```
 
 This is a special vignette, which shares the same name as the package.
