@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ji.rpkg.template: TAGLINE
+# daedalus.workshop: TAGLINE
 
 <!-- badges: start -->
 
@@ -10,20 +10,20 @@ yet, or the repository is only intended to be a limited example, demo,
 or
 proof-of-concept.](https://www.repostatus.org/badges/latest/concept.svg)](https://www.repostatus.org/#concept)
 [![R build
-status](https://github.com/jameel-institute/ji.rpkg.template/workflows/R-CMD-check/badge.svg)](https://github.com/jameel-institute/ji.rpkg.template/actions/workflows/R-CMD-check.yaml)
+status](https://github.com/jameel-institute/daedalus.workshop/workflows/R-CMD-check/badge.svg)](https://github.com/jameel-institute/daedalus.workshop/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/jameel-institute/ji.rpkg.template/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jameel-institute/ji.rpkg.template?branch=main)
+coverage](https://codecov.io/gh/jameel-institute/daedalus.workshop/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jameel-institute/daedalus.workshop?branch=main)
 [![CRAN
-status](https://www.r-pkg.org/badges/version/ji.rpkg.template)](https://CRAN.R-project.org/package=ji.rpkg.template)
+status](https://www.r-pkg.org/badges/version/daedalus.workshop)](https://CRAN.R-project.org/package=daedalus.workshop)
 <!-- badges: end -->
 
-*ji.rpkg.template* is a template package and repository on which future
+*daedalus.workshop* is a template package and repository on which future
 Jameel Institute packages are based.
 
-To use this template, select *ji.rpkg.template* from the drop-down menu
+To use this template, select *daedalus.workshop* from the drop-down menu
 under **Repository template** when creating a new repository in the
 Jameel Institute organisation. Replace all instances of
-“ji.rpkg.template” with your package name. Make sure to also:
+“daedalus.workshop” with your package name. Make sure to also:
 
 1.  Edit the `DESCRIPTION` as appropriate with the correct package
     information;
@@ -36,17 +36,57 @@ Jameel Institute organisation. Replace all instances of
 4.  Remove these instructions from `README.Rmd`, and re-render the `.md`
     file using `devtools::render_readme()`.
 
+## Development tooling included
+
+**Remove this section from your repo.**
+
+Includes the general package structure, along with testing,
+documentation, and CI infrastructure described in [R Packages
+2e](https://r-pkgs.org/).
+
+1.  Modern R formatting and linting using
+    [air](https://posit-dev.github.io/air/formatter.html) and
+    [jarl](https://jarl.etiennebacher.com/); much faster than *styler*
+    and *lintr*, but may not have some functionality (such as replacing
+    assignment operators, or catching some lints). We still use *lintr*
+    in the CI workflow, so it is worth using that once in a while.
+
+2.  Includes C++ formatting, linting, and static code analysis using
+    [clang-format](https://clang.llvm.org/docs/ClangFormat.html),
+    [cpplint](https://github.com/cpplint/cpplint), and
+    [cppcheck](https://cppcheck.sourceforge.io/). Remember to replace
+    the template package name with the names of files to be processed in
+    the C++ linting shell script under `scripts/format-lnt-cpp.sh`. Or
+    remove this script and associated command from the Makefile (see
+    next).
+
+3.  All formatting and linting workflows are nicely bundled into a
+    Makefile. Install `make` on your system, and run `make <command>` to
+    format-lint R, C++, or both.
+
+``` sh
+# both R and C++, using fast tools for R (air, jarl)
+make format-lint
+
+# only R or C++
+make format-lint-r
+
+make format-lint-cpp
+```
+
+4.  Includes LLM-associated directories in Rbuildignore.
+
 ## Installation
 
 **NOTE:** Remove or comment out installation sources as appropriate.
 
-You can install the development version of ji.rpkg.template from the
+You can install the development version of daedalus.workshop from the
 Jameel Institute R-universe with:
 
 ``` r
 # installation from R-universe
 # install.packages(
-#   "ji.rpkg.template", 
+#   "daedalus.workshop", 
 #   repos = c(
 #     "https://jameel-institute.r-universe.dev", "https://cloud.r-project.org"
 #   )
@@ -57,7 +97,7 @@ or from GitHub [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
-# pak::pak("jameel-institute/ji.rpkg.template")
+# pak::pak("jameel-institute/daedalus.workshop")
 ```
 
 ## Quick start

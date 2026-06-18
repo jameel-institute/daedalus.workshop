@@ -1,5 +1,5 @@
-Package: ji.rpkg.template
-Title: Your Package Title in Title Case
+Package: daedalus.workshop
+Title: Generate Pandemic Response Workshop Materials Using Daedalus
 Version: 0.0.0.9000
 Authors@R: c(
     person("Pratik", "Gupte", , "pratik.gupte@lshtm.ac.uk", role = c("aut", "cre"),
@@ -7,9 +7,8 @@ Authors@R: c(
     person("Abdul Latif Jameel Institute for Disease and Emergency Analytics", role = "fnd"),
     person("Imperial College of Science, Technology and Medicine", role = c("cph", "fnd"))
   )
-Description: Your package description. It must end with a period (".") and
-    include relevant bibliographical references if applicable, using the
-    following format: Author et al. (2023) <doi:10.5281/zenodo.6619350>.
+Description: Automate the generation of pandemic response workshop materials
+    using the Daedalus family of packages.
 License: MIT + file LICENSE
 Suggests: 
     knitr,
@@ -23,4 +22,4 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-GB
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
