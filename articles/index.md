@@ -2,4 +2,4 @@
 
 ### All vignettes
 
-- [ji-rpkg-template](ji-rpkg-template.md):
+- [ji-rpkg-template](daedalus.workshop.md):

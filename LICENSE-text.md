@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2024
-    COPYRIGHT HOLDER: ji.rpkg.template authors
+    COPYRIGHT HOLDER: daedalus.workshop authors

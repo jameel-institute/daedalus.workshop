@@ -13,11 +13,11 @@
 
 ## Citation
 
-Gupte P (2026). *ji.rpkg.template: Your Package Title in Title Case*. R
-package version 0.0.0.9000.
+Gupte P (2026). *daedalus.workshop: Generate Pandemic Response Workshop
+Materials Using Daedalus*. R package version 0.0.0.9000.
 
     @Manual{,
-      title = {ji.rpkg.template: Your Package Title in Title Case},
+      title = {daedalus.workshop: Generate Pandemic Response Workshop Materials Using Daedalus},
       author = {Pratik Gupte},
       year = {2026},
       note = {R package version 0.0.0.9000},
