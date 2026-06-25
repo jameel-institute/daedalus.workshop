@@ -1,0 +1,163 @@
+---
+title: "Information Handout"
+author: Initiative for the Economics of Pandemic Preparedness (EPPI), Jameel Institute, Imperial College London
+date: "`r Sys.Date()`"
+output:
+  bookdown::pdf_document2:
+    documentclass: scrreprt
+    toc-depth: 2
+    secnumdepth: 2
+    geometry: "left=5cm, right=5cm, top=2.5cm, bottom=2.5cm"
+header-includes:
+  - \usepackage{tgtermes}
+link-citations: true
+params:
+  workshop_name:
+    label: "The workshop name."
+    value: "Pandemic Response Simulation Exercise"
+  date:
+    label: "Workshop date."
+    value: "2026-01-01"
+  country:
+    label: "The country affected by the hypothetical epidemic."
+    value: "United Kingdom"
+    choices: ["United Kingdom", "France", "Vietnam", "Singapore"]
+  base_disease:
+    label: "The baseline disease from which to draw epidemic parameters."
+    value: "influenza_2009"
+    choices: ["influenza_1918", "influenza_1957", "influenza_2009", "sars_cov_1", "sars_cov_2_pre_alpha", "sars_cov_2_delta", "sars_cov_2_omicron"]
+  r0:
+    label: "The initial basic reproduction number of the epidemic."
+    value: 1.5
+    input: numeric
+  t0:
+    label: "Current time in days since the first case."
+    value: 30
+    input: numeric
+  horizon:
+    label: "Time horizon in days since the first case."
+    value: 100
+    input: numeric
+---
+
+```{r settings, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.width = 9,
+  fig.height = 5,
+  dpi = 300,
+  collapse = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%",
+  fig.showtext = TRUE
+)
+showtext::showtext_auto()
+```
+
+```{r setup}
+library(daedalus)
+library(daedalus.compare)
+library(ggplot2)
+library(ggdist)
+```
+
+```{r params}
+country <- params$country
+```
+
+# Section 1: Explanation of the exercise
+
+You are a government advisor in `r country`.
+There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country`.  
+
+On day 30, every table needs to make a decision:
+
+- Should we implement closures? 
+- Should we close businesses, while leaving schools open?
+- Or close both businesses and schools? Shall we implement this now, or on any day over the next 70 days?
+- You can choose amongst several strategies, ranging in stringency (see table 1).
+
+The Imperial team presents you with projections of the health and economic outcomes of different strategies for the next 100 days.
+They use Imperial’s DAEDALUS model for the projections (see page 5).
+Before the coffee break, your table needs to commit to one strategy, and note it down on the response strategy form. 
+
+There is considerable uncertainty surrounding the outcomes from each strategy (see figure 1B). 
+
+After the coffee break, every table needs to briefly explain their chosen strategy.
+Our senior decision makers choose the strategy they want to implement.  
+
+On Day 100, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next 100 days.
+The team also presents outcomes for one alternative strategy. 
+
+The workshop concludes with a discussion of the choices and the use of modelling in making tough trade-offs during early outbreaks.
+
+## The Daedalus Model
+
+DAEDALUS models infection transmissions within the community, the economy, and during travel between these places.
+
+The community consists of individuals who are not employed, workers during their leisure time and when working from home, school children and students during their leisure time and when attending school online.
+
+The economy consists of workers in 45 economic sectors, including the education sector.
+
+There is an exchange between the community and the economy, via workers travelling between home and workplaces, students and teachers traveling to educational institutions, and individuals consuming goods and services.
+
+Transmission of infections in the community, at workplaces, in educational institutions, while consuming goods and services and travelling is modelled via a deterministic compartmental SEIR model.
+This determines the number of infected individuals seeking hospital treatment.
+Contact rates vary by age group and by economic sectors.
+
+The government can implement partial closures of schools and/or of economic activity not essential to day-to-day life.
+This reduces workplace infections because workers and/or students stay in the community and do not travel and spend time at workplaces, which has a dampening effect on infections.
+
+However, closures reduce sectors’ economic production to the percentage they are closed; this results in a loss of economic output (measured by sectoral Gross Value Added, or GVA) and a reduction in short-term GDP in the aggregate, compared to pre-pandemic production.
+
+Sickness absences and deaths of workers, teachers and students reduces economic output, proxied by the GVA of the sector per worker and days of sickness, and for deaths until the end of the projection (adjustments are made for sectors that are partially closed by government mitigation).
+
+There is a circular loop, in that health, economic and education losses may instigate governments to implement or lift mitigation policies.
+See the online dashboard, [Daedalus Explore](https://daedalus.jameel-institute.org/scenarios/new).
+
+## Distribution of $R_0$
+
+```{r r0_distribution}
+disease <- params$base_disease
+disease_obj <- daedalus_infection(disease)
+r0 <- params$r0
+n_samples <- 100
+
+disease_samples <- make_infection_samples(
+  disease,
+  list(
+    r0 = distributional::dist_beta(2, 5)
+  ),
+  list(
+    r0 = sort(c(1.0, r0))
+  ),
+  n_samples
+)
+
+# r0 values
+r0_samples <- vapply(disease_samples, `[[`, numeric(1L), "r0")
+```
+
+```{r r0_dist_plot}
+fig <- ggplot() +
+  stat_histinterval(aes(r0_samples))
+
+fig
+
+ggsave("figure.png", fig)
+```
+
+## Distribution of hospitalisation rate
+
+## Uncertainty in epidemic projections
+
+# Section 2: Epidemic projections under mitigation scenarios
+
+## Projected epidemic outcomes for an unmitigated epidemic
+
+## Proejcted epidemic outcomes for mitigation scenarios
+
+# Section 3: Additional decision-making aids
+
+### subs-sub section

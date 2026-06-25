@@ -1,0 +1,5 @@
+name: Daedalus workshop presentation
+description: >
+  A template for presentations showing key figures for different phases of
+  real-time pandemic response workshops using the Daedalus family of packages.
+create_dir: TRUE
