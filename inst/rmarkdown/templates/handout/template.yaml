@@ -1,0 +1,5 @@
+name: Daedalus workshop handout
+description: >
+  A template for the initial information handout for real-time pandemic response
+  workshops using the Daedalus family of packages.
+create_dir: TRUE
