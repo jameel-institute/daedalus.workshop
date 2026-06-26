@@ -28,4 +28,5 @@ Imports:
     cli,
     ggplot2,
     here,
+    purrr,
     revealjs

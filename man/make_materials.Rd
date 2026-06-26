@@ -9,7 +9,8 @@ make_materials(
   disease = "sars_cov_1",
   r0 = 3,
   t0 = 30,
-  t_end = 100
+  horizon = 100,
+  n_samples = 10
 )
 }
 \description{

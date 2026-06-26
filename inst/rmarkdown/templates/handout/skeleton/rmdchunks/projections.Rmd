@@ -1,0 +1,1414 @@
+
+```{r settings_internal, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+```
+
+```{r run-models}
+output <- daedalus(country, disease)
+
+print(output)
+
+print(get_epidemic_summary(output))
+```
+
+## REMOVE HEADING - REAL PROJECTIONS HERE
+
+```{r plot_labels}
+x_label_days <- "Days after first detected case"
+measure_levels <- c(
+  "daily_infections", "daily_hospitalisations",
+  "total_hosp", "daily_deaths"
+)
+```
+
+```{r r0_samples}
+# generate infection using H1N1 as a base
+# this is the least transmissible infection for which {daedalus} has data
+disease_x <- daedalus_infection(disease)
+r0 <- get_data(disease_x, "r0")
+r0_samples <- withr::with_seed(
+  1, rbeta(n_samples, 2, 5)
+) * r0 + 1.0
+r0_samples <- round(r0_samples, 4)
+r0_samples <- scales::rescale(r0_samples, c(1.0, 2))
+r0_samples <- sort(r0_samples)
+
+# R0 to use in phase 1 and 2
+r0_phase_1 <- median(r0_samples)
+r0_phase_2 <- quantile(r0_samples, 0.83)
+```
+
+```{r r0_summary}
+# get 95% confidence intervals around R0
+ci_95 <- ci(r0_samples)
+r0_summary <- c(
+  lower = median(r0_samples) - ci_95,
+  median = median(r0_samples),
+  upper = median(r0_samples) + ci_95
+)
+r0_summary <- round(r0_summary, 3)
+```
+
+```{r severity_profile}
+# draw mortality profile so working and school age worst affected
+severity_profile <- c(0.2, 1.5, 2, 0.2)
+
+# apply severity profile
+hfr <- get_data(disease_x, "hfr")
+hfr <- mean(hfr) * severity_profile * 10
+```
+
+```{r disease_list}
+# make list of infection objects
+disease_list <- Map(
+  r0_samples,
+  f = function(x, y) {
+    daedalus_infection(
+      "influenza_2009",
+      r0 = x,
+      hfr = hfr
+    )
+  }
+)
+disease_tags <- glue::glue("sample_{seq_along(disease_list)}")
+```
+
+```{r infection_samples}
+# make list of infection objects
+disease_list <- Map(
+  r0_samples,
+  f = function(x, y) {
+    daedalus_infection(
+      "influenza_2009",
+      r0 = x,
+      hfr = hfr
+    )
+  }
+)
+disease_tags <- glue::glue("sample_{seq_along(disease_list)}")
+```
+
+```{r timepoints}
+# taken from document params
+day_now <- params$t0
+horizon <- params$horizon
+```
+
+```{r response_levels}
+# pre-canned responses
+response_levels <- rev(names(daedalus.data::closure_strategy_data))
+
+# responses as timed NPIs
+responses <- Map(
+  daedalus.data::closure_strategy_names,
+  daedalus.data::closure_strategy_data,
+  f = function(n, v) {
+    daedalus_timed_npi(
+      day_now + 1, horizon,
+      list(v),
+      country
+    )
+  }
+)
+```
+
+```{r hosp_cap}
+# used to draw thresholds on projection figures
+hcap <- get_data(country, "hospital_capacity")
+```
+
+```{r output}
+output <- run_scenarios(
+  country,
+  disease_list,
+  response = responses,
+  time_end = horizon,
+  initial_state_manual = list(
+    p_infectious = 1 / sum(country$demography),
+    p_asymptomatic = 0.99
+  )
+)
+```
+
+```{r epi_curve_summary}
+# get epi curve data and prepare for plotting
+data_epi_curve <- get_epicurve_data(output, disease_tags, format = "long")
+data_epi_curve <- mutate(
+  data_epi_curve,
+  response = forcats::fct_relevel(response, response_levels)
+)
+
+death_reporting <- 0.9
+case_reporting <- 0.33
+hosp_reporting <- 0.9
+
+# get reported values
+data_epi_curve <- mutate(
+  data_epi_curve,
+  reporting_rate = case_when(
+    measure == "daily_deaths" ~ death_reporting,
+    measure == "daily_infections" ~ case_reporting,
+    measure == "daily_hospitalisations" ~ hosp_reporting,
+    measure == "total_hosp" ~ hosp_reporting
+  ),
+  reported_value = value * reporting_rate
+)
+
+data_epi_curve_summary <- group_by(
+  data_epi_curve, time, response, measure
+) %>%
+  curve_interval(
+    value, reported_value,
+    .width = c(0.5, 0.95)
+  )
+
+data_epi_curve_summary_unmit <- filter(
+  data_epi_curve_summary, response == "none"
+)
+```
+
+```{r epi_summary}
+data_epi_summary <- get_summary_data(output, disease_tags, format = "long")
+data_epi_summary <- mutate(
+  data_epi_summary,
+  response = forcats::fct_relevel(response, response_levels)
+)
+
+# get reported values
+data_epi_summary <- mutate(
+  data_epi_summary,
+  reporting_rate = case_when(
+    measure == "total_deaths" ~ death_reporting,
+    measure == "epidemic_size" ~ case_reporting,
+    measure == "total_hospitalisations" ~ hosp_reporting
+  ),
+  reported_value = value * reporting_rate
+)
+```
+
+```{r deaths}
+data_deaths <- get_summary_data(
+  output, disease_tags,
+  format = "long", measures = "deaths", groups = "age_group"
+)
+data_deaths <- mutate(
+  data_deaths,
+  response = forcats::fct_relevel(response, response_levels),
+  reported_value = value * death_reporting
+)
+
+# get naive cfr
+data_cfr <- get_summary_data(
+  output, disease_tags,
+  format = "long", measures = c("infections", "deaths"),
+  groups = "age_group"
+)
+data_cfr <- mutate(
+  data_cfr,
+  response = forcats::fct_relevel(response, response_levels),
+  reporting_rate = case_when(
+    measure == "total_deaths" ~ death_reporting,
+    measure == "epidemic_size" ~ case_reporting
+  ),
+  reported_value = value * reporting_rate
+)
+
+data_cfr <-
+  data_cfr %>%
+  select(response, age_group, measure, reported_value, tag) %>%
+  pivot_wider(
+    id_cols = c("response", "age_group", "tag"), names_from = "measure",
+    values_from = "reported_value"
+  ) %>%
+  mutate(
+    cfr = total_deaths / epidemic_size
+  )
+
+data_deaths_unmit <- filter(data_deaths, response == "none")
+```
+
+```{r costs_summary}
+data_cost_output <- get_cost_data(
+        output, disease_tags, format = "long"
+    ) %>%
+  filter(domain != "life_years")
+
+data_cost_output <- mutate(
+  data_cost_output,
+  response = forcats::fct_relevel(response, response_levels)
+)
+
+data_cost_life <- filter(data_cost_output, domain == "life_value")
+```
+
+```{r edu_costs}
+# NOTE: education costs are very similar across R0
+# as the main component is future earnings lost due to school closures;
+# this aspect is deterministic: value school year * closure duration;
+# summaring this as a median to show a bar chart
+data_cost_edu <- filter(data_cost_output, domain == "education") %>%
+  summarise(
+    cost = median(cost), .by = "response"
+  )
+```
+
+```{r econ_costs}
+data_econ_costs <- get_econ_cost_data(output)
+
+data_econ_costs <- mutate(
+  data_econ_costs,
+  response = forcats::fct_relevel(response, response_levels)
+)
+
+# separate data on closures (deterministic) from absences
+# and summarise closure costs using median
+data_econ_cost_closures <- filter(
+  data_econ_costs, cost_type == "economic_cost_closures"
+) %>%
+  group_by(response) %>%
+  summarise(cost = median(cost))
+
+data_econ_cost_absences <- filter(
+  data_econ_costs, cost_type == "economic_cost_absences"
+)
+```
+
+# Unmitigated pandemic
+
+## Epidemic projections
+
+```{r curve_labels}
+curve_measure_labels <- c(
+  daily_deaths = "New deaths",
+  daily_hospitalisations = "New hospital demand",
+  total_hosp = "Total hospital demand"
+)
+```
+
+### Daily infections: Explainer
+
+```{r plot_daily_cases_unmit_explainer}
+plot_daily_cases_unmit_explainer <-
+  ggplot() +
+  geom_line(
+    data = data_epi_curve %>%
+      filter(measure == "daily_infections", response == "none"),
+    aes(time, reported_value, group = tag),
+    alpha = 0.8
+  ) +
+  geom_vline(
+    xintercept = day_now,
+    col = "red", linetype = "dashed"
+  ) +
+  scale_fill_brewer(
+    palette = "Blues",
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  labs(
+    x = x_label_days,
+    y = "New detected cases",
+    fill = "Proj. interv."
+  ) +
+  # xlim(0, 60) +
+  theme_bw(base_size = 24, base_family = "Arial")
+
+ggsave(
+  "../figures/plot_unmit_daily_cases_explainer.png",
+  plot_daily_cases_unmit_explainer,
+  height = 7, width = 10
+)
+```
+
+```{r plot_daily_infections_unmit}
+# this is the true infections
+plot_daily_infections_unmit <-
+  ggplot() +
+  geom_line(
+    data = data_epi_curve %>%
+      filter(measure == "daily_infections", response == "none"),
+    aes(time, value, group = tag),
+    alpha = 0.8
+  ) +
+  geom_lineribbon(
+    data = data_epi_curve_summary_unmit %>%
+      filter(measure == "daily_infections"),
+    aes(time, value, ymin = value.lower, ymax = value.upper),
+    col = "black",
+    alpha = 0.8
+  ) +
+  geom_vline(
+    xintercept = day_now,
+    col = "red", linetype = "dashed"
+  ) +
+  scale_fill_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  labs(
+    x = x_label_days,
+    y = "Daily new infections",
+    fill = "Proj. interv."
+  ) +
+  xlim(20, 60) +
+  theme_bw(base_size = 24, base_family = "Arial")
+
+ggsave(
+  "../figures/DO_NOT_SHOW_unmit_daily_infections.png",
+  plot_daily_infections_unmit, height = 7, width = 10
+)
+```
+
+### Daily reported cases
+
+```{r plot_daily_cases_unmit}
+plot_daily_cases_unmit <-
+  ggplot() +
+  geom_line(
+    data = data_epi_curve %>%
+      filter(measure == "daily_infections", response == "none"),
+    aes(time, reported_value, group = tag),
+    alpha = 0.8
+  ) +
+  geom_lineribbon(
+    data = data_epi_curve_summary_unmit %>%
+      filter(measure == "daily_infections"),
+    aes(time, reported_value,
+      ymin = reported_value.lower,
+      ymax = reported_value.upper
+    ),
+    col = "black",
+    alpha = 0.8
+  ) +
+  geom_vline(
+    xintercept = day_now,
+    col = "red", linetype = "dashed"
+  ) +
+  scale_fill_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  labs(
+    x = x_label_days,
+    y = "New detected cases",
+    caption = "Please consider that there is under-ascertainment.",
+    fill = "Proj. interv."
+  ) +
+  xlim(20, 60) +
+  theme_bw(base_size = 24, base_family = "Arial")
+
+ggsave(
+  "../figures/plot_unmit_daily_cases.png",
+  plot_daily_cases_unmit, height = 7, width = 10
+)
+```
+
+```{r plot_epi_curves}
+measures <- c("daily_deaths", "daily_hospitalisations", "total_hosp")
+reporting_rates <- c(death_reporting, hosp_reporting, hosp_reporting)
+
+pwalk(
+  measures, curve_measure_labels, reporting_rates,
+  f = function(m, l, reporting) {
+    plot_epi_curves_unmit <-
+      ggplot() +
+      geom_line(
+        data = data_epi_curve %>%
+          filter(measure == m, response == "none"),
+        aes(time, reported_value, group = tag),
+        alpha = 0.8, linewidth = 0.2
+      ) +
+      geom_lineribbon(
+        data = data_epi_curve_summary_unmit %>%
+          filter(measure == m),
+        aes(time, reported_value,
+          ymin = reported_value.lower,
+          ymax = reported_value.upper
+        ),
+        col = "black",
+        alpha = 0.8
+      ) +
+      geom_vline(
+        xintercept = day_now,
+        col = "red", linetype = "dashed"
+      ) +
+      scale_fill_viridis_d(
+        begin = 0.1, direction = -1,
+        labels = function(x) {
+          scales::percent(as.numeric(x))
+        }
+      ) +
+      scale_y_continuous(
+        labels = scales::comma
+      ) +
+      labs(
+        x = x_label_days,
+        y = l,
+        fill = "Proj. interv.",
+        caption = "Please consider that there is under-ascertainment."
+      ) +
+      xlim(20, 60) +
+      theme_bw(base_size = 24, base_family = "Arial")
+
+    if (m %in% c("total_hosp", "daily_hospitalisations")) {
+      plot_epi_curves_unmit <- plot_epi_curves_unmit +
+        geom_hline(
+          yintercept = hcap,
+          col = "red", linetype = "dashed"
+        )
+    }
+
+    filename <- glue::glue("../figures/plot_unmit_{m}.png")
+    ggsave(
+      filename,
+      plot = plot_epi_curves_unmit,
+      height = 7, width = 10
+    )
+  }
+)
+```
+
+## Infections, hospital demand, deaths
+
+```{r epi_unmit_summary}
+data_epi_summary_unmit <- filter(
+  data_epi_summary, response == "none"
+)
+```
+
+```{r summary_labels}
+summary_measure_labels <- c(
+  epidemic_size = "Cumulative detected cases",
+  total_deaths = "Cumulative deaths"
+)
+```
+
+```{r plot_unmit_epi_summary}
+plot_unmit_epi_summary <-
+  ggplot(
+    data_epi_summary_unmit %>%
+      filter(measure != "total_hospitalisations")
+  ) +
+  stat_interval(
+    aes(
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(y = reported_value),
+    .width = c(0.5, 0.95)
+  ) +
+  facet_wrap(
+    facets = vars(measure),
+    labeller = labeller(
+      measure = summary_measure_labels
+    ),
+    scales = "free"
+  ) +
+  scale_y_continuous(
+    labels = scales::label_comma()
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = NULL,
+    y = "Count (up to day 60)",
+    colour = "Proj. interv.",
+    caption = "Please consider that there is under-ascertainment.",
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(base_size = 24, base_family = "Arial") +
+  theme(axis.text.x = element_blank())
+
+ggsave(
+  "../figures/plot_unmit_epi_summary.png",
+  plot = plot_unmit_epi_summary,
+  height = 7, width = 10
+)
+```
+
+## Deaths by age group
+
+```{r plot_unmit_deaths_by_age}
+plot_unmit_deaths_by_age <-
+  ggplot(data_deaths_unmit) +
+  stat_interval(
+    aes(
+      forcats::fct_relevel(
+        age_group,
+        c("0-4", "5-19", "20-64", "65+")
+      ),
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(age_group, y = reported_value),
+    .width = c(0.5, 0.95),
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    y = "Cumulative deaths (up to day 60)",
+    x = "Age group",
+    colour = "Proj. interv.",
+    caption = "Please consider that there is under-ascertainment."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(
+    base_size = 24, base_family = "Arial"
+  )
+
+ggsave(
+  "../figures/plot_unmit_deaths_by_age.png",
+  plot_unmit_deaths_by_age,
+  height = 7, width = 10
+)
+```
+
+### CFR by age group
+
+```{r plot_cfr_by_age}
+plot_cfr_by_age <-
+  ggplot(data_cfr) +
+  stat_interval(
+    aes(
+      forcats::fct_relevel(
+        age_group,
+        c("0-4", "5-19", "20-64", "65+")
+      ),
+      y = cfr,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(age_group, y = cfr),
+    .width = c(0.5, 0.95),
+  ) +
+  scale_y_continuous(
+    labels = scales::percent
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    y = "CFR (naive)",
+    x = "Age group",
+    colour = "Proj. interv.",
+    caption = "Please consider that there is under-ascertainment."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(
+    base_size = 24, base_family = "Arial"
+  )
+
+ggsave(
+  "../figures/plot_unmit_cfr_by_age.png",
+  plot_cfr_by_age,
+  height = 7, width = 10
+)
+```
+
+## Lost life years, future earnings, and GVA
+
+```{r data_cost_output_unmit}
+data_cost_output_unmit <- filter(
+  data_cost_output, response == "none"
+)
+```
+
+```{r loss_measure_labels}
+loss_measure_labels <- c(
+  "GVA", "Future earnings", "Life years"
+)
+```
+
+```{r plot_unmit_gva_loss}
+plot_unmit_gva_loss <-
+  ggplot(data_cost_output_unmit) +
+  stat_interval(
+    aes(
+      x = domain, y = cost,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(domain, cost),
+    .width = c(0.5, 0.95),
+  ) +
+  scale_x_discrete(
+    labels = loss_measure_labels
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(
+      prefix = "$", suffix = " M"
+    )
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = NULL,
+    y = "Cumulative value lost (billion $)",
+    col = "Proj. interv.",
+    caption = "Valuation of losses from reduced GVA, reduced education, and deaths."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial")
+
+ggsave(
+  "../figures/plot_unmit_gva_loss.png",
+  plot_unmit_gva_loss,
+  height = 7, width = 10
+)
+```
+
+# Mitigation measures
+
+## Epidemic projections
+
+```{r curve_measure_labels}
+curve_measure_labels <- c(
+  daily_infections = "New detected cases",
+  daily_deaths = "New deaths",
+  daily_hospitalisations = "New hospital demand",
+  total_hosp = "Total hospital demand"
+)
+```
+
+```{r response_labels}
+response_labels <- c(
+  none = "Unmitigated",
+  economic_closures = "Busin. clos. (light)",
+  elimination = "S+B clos. (severe)",
+  school_closures = "S (severe) + B (light)"
+)
+```
+
+```{r plot_scenario_curves}
+measures <- c(
+  "daily_infections", "daily_deaths", "daily_hospitalisations", "total_hosp"
+)
+
+pwalk(
+  measures, curve_measure_labels,
+  f = function(m, l) {
+    plot_epi_curves_compare <-
+      ggplot() +
+      geom_line(
+        data = data_epi_curve %>%
+          filter(measure == m),
+        aes(time, reported_value, group = tag),
+        alpha = 0.8
+      ) +
+      geom_lineribbon(
+        data = data_epi_curve_summary %>%
+          filter(measure == m),
+        aes(time, reported_value,
+          ymin = reported_value.lower,
+          ymax = reported_value.upper
+        ),
+        col = "black",
+        alpha = 0.8
+      ) +
+      facet_grid(
+        cols = vars(response),
+        labeller = labeller(
+          response = response_labels
+        )
+      ) +
+      scale_fill_viridis_d(
+        begin = 0.1, direction = -1,
+        labels = function(x) {
+          scales::percent(as.numeric(x))
+        }
+      ) +
+      scale_y_continuous(
+        labels = scales::comma
+      ) +
+      labs(
+        x = x_label_days,
+        y = l,
+        fill = "Proj. interv.",
+        caption = glue::glue(
+          "Please consider that there is under-ascertainment.
+          S = school closures; B = business closures."
+        )
+      ) +
+      xlim(20, 60) +
+      theme_bw(base_size = 24, base_family = "Arial")
+
+    if (m %in% c("total_hosp", "daily_hospitalisations")) {
+      plot_epi_curves_compare <- plot_epi_curves_compare +
+        geom_hline(
+          yintercept = hcap,
+          col = "red", linetype = "dashed"
+        ) +
+        annotate(
+          "text",
+          x = horizon * 2 / 3,
+          y = hcap,
+          label = "Surge hosp. cap.",
+          size = 8,
+          colour = "red"
+        )
+    }
+
+    if (m == "daily_infections") {
+      m <- "daily_cases"
+    }
+
+    filename <- glue::glue("../figures/plot_compare_{m}.png")
+    ggsave(
+      filename,
+      plot = plot_epi_curves_compare,
+      width = 21, height = 6
+    )
+  }
+)
+```
+
+```{r plot_scenario_curves_square}
+pwalk(
+  measures, curve_measure_labels,
+  f = function(m, l) {
+    plot_epi_curves_compare <-
+      ggplot() +
+      geom_line(
+        data = data_epi_curve %>%
+          filter(measure == m),
+        aes(time, reported_value, group = tag),
+        alpha = 0.8
+      ) +
+      geom_lineribbon(
+        data = data_epi_curve_summary %>%
+          filter(measure == m),
+        aes(time, reported_value,
+          ymin = reported_value.lower,
+          ymax = reported_value.upper
+        ),
+        col = "black",
+        alpha = 0.8
+      ) +
+      facet_wrap(
+        vars(response),
+        labeller = labeller(
+          response = response_labels
+        )
+      ) +
+      scale_fill_viridis_d(
+        begin = 0.1, direction = -1,
+        labels = function(x) {
+          scales::percent(as.numeric(x))
+        }
+      ) +
+      scale_y_continuous(
+        labels = scales::comma
+      ) +
+      labs(
+        x = x_label_days,
+        y = l,
+        fill = "Proj. interv.",
+        caption = glue::glue(
+          "Please consider that there is under-ascertainment.
+          S = school closures; B = business closures."
+        )
+      ) +
+      xlim(20, 60) +
+      theme_bw(base_size = 24, base_family = "Arial")
+
+    if (m %in% c("total_hosp", "daily_hospitalisations")) {
+      plot_epi_curves_compare <- plot_epi_curves_compare +
+        geom_hline(
+          yintercept = hcap,
+          col = "red", linetype = "dashed"
+        ) +
+        annotate(
+          "text",
+          x = horizon * 2 / 3,
+          y = hcap,
+          label = "Surge hosp. cap.",
+          size = 8,
+          colour = "red"
+        )
+    }
+
+    if (m == "daily_infections") {
+      m <- "daily_cases"
+    }
+
+    filename <- glue::glue("../figures/plot_compare_{m}_square.png")
+    ggsave(
+      filename,
+      plot = plot_epi_curves_compare,
+      width = 14, height = 14
+    )
+  }
+)
+```
+
+## Infections, hospital demand, deaths
+
+```{r plot_compare_epi_summary}
+# plot uncertainty in epi outcomes
+plot_compare_epi_summary <-
+  ggplot(
+    data_epi_summary %>%
+      filter(measure != "total_hospitalisations")
+  ) +
+  stat_interval(
+    aes(
+      response,
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 20, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(response, y = reported_value),
+    .width = c(0.5, 0.95)
+  ) +
+  facet_wrap(
+    facets = vars(measure),
+    labeller = labeller(
+      measure = summary_measure_labels
+    ),
+    scales = "free"
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_x_discrete(
+    labels = response_labels,
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = NULL,
+    y = "Count",
+    colour = "Proj. interval",
+    caption = glue::glue(
+          "Please consider that there is under-ascertainment.
+          S = school closures; B = business closures."
+        )
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial")
+
+filename <- glue::glue("../figures/plot_compare_epi_summary.png")
+ggsave(
+  filename,
+  plot = plot_compare_epi_summary,
+  width = 14, height = 6
+)
+```
+
+## Table: Hospital capacity breaches
+
+```{r table_hcap_breaches}
+data_epi_curve %>%
+  filter(
+    measure == "total_hosp"
+  ) %>%
+  group_by(response, tag) %>%
+  group_by(response) %>%
+  summarise(
+    hcap_exceeded_pct = sum(max(value) > hcap)
+  ) %>%
+  readr::write_csv(
+    "../tables/table_hcap_breaches.csv"
+  )
+```
+
+## Deaths by age group
+
+```{r plot_compare_deaths_by_age}
+plot_compare_deaths_by_age <-
+  ggplot(data_deaths) +
+  stat_interval(
+    aes(
+      response,
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 20, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(response, y = reported_value)
+  ) +
+  facet_grid(
+    cols = vars(
+      forcats::fct_relevel(
+        age_group,
+        c("0-4", "5-19", "20-64", "65+")
+      )
+    ),
+    labeller = labeller(
+      response = response_labels
+    )
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_x_discrete(
+    labels = response_labels,
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    y = "Cumulative deaths",
+    x = NULL,
+    colour = "Proj. interval",
+    caption = glue::glue(
+      "Please consider that there is under-ascertainment.
+      S = school closures; B = business closures."
+    )
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial")
+
+ggsave(
+  "../figures/plot_compare_deaths_by_age.png",
+  plot_compare_deaths_by_age,
+  height = 10, width = 25
+)
+```
+
+```{r plot_compare_deaths_by_age_square}
+plot_compare_deaths_by_age <-
+  ggplot(data_deaths) +
+  stat_interval(
+    aes(
+      response,
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 20, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(response, y = reported_value)
+  ) +
+  facet_wrap(
+    vars(
+      forcats::fct_relevel(
+        age_group,
+        c("0-4", "5-19", "20-64", "65+")
+      )
+    ),
+    labeller = labeller(
+      response = response_labels
+    )
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_x_discrete(
+    labels = response_labels,
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    y = "Cumulative deaths",
+    x = NULL,
+    colour = "Proj. interval",
+    caption = glue::glue(
+      "Please consider that there is under-ascertainment.
+      S = school closures; B = business closures."
+    )
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial")
+
+ggsave(
+  "../figures/plot_compare_deaths_by_age_square.png",
+  plot_compare_deaths_by_age,
+  height = 14, width = 14
+)
+```
+
+## Table: Deaths by age
+
+```{r fn_qtl}
+fn_qtl <- function(x, probs = c(0.5, 0.25, 0.75)) {
+  tibble(
+    val = round(quantile(x, probs, na.rm = TRUE)),
+    quant = glue::glue("pctl_{probs * 100}")
+  ) %>%
+    pivot_wider(names_from = "quant", values_from = "val")
+}
+```
+
+```{r table_deaths_by_age}
+data_deaths %>%
+  group_by(response, age_group) %>%
+  reframe(fn_qtl(reported_value)) %>%
+  mutate(
+    response = case_when(
+      response == "none" ~ "unmitigated",
+      response == "economic_closures" ~ "business_closures",
+      response == "elimination" ~ "S+B closures",
+      .default = response
+    )
+  ) %>%
+  readr::write_csv(
+    file = "../tables/table_deaths_by_age.csv"
+  )
+```
+
+## Lost life years, future earnings, and GVA
+
+```{r plot_compare_gva_loss}
+plot_compare_gva_loss <-
+  ggplot(data_cost_output) +
+  stat_interval(
+    aes(
+      x = domain, y = cost,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 20, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(domain, cost)
+  ) +
+  facet_grid(
+    cols = vars(response),
+    labeller = labeller(
+      response = response_labels
+    )
+  ) +
+  scale_x_discrete(
+    labels = loss_measure_labels
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(
+      scale = 1e-3, prefix = "$",
+      suffix = " B", accuracy = 1
+    )
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = "Domain",
+    y = "Cumulative value lost (billion $)",
+    col = "Proj. interv.",
+    caption = "Valuation of losses from reduced GVA, reduced education, and deaths."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial")
+
+ggsave(
+  "../figures/plot_compare_gva_loss.png",
+  plot_compare_gva_loss,
+  height = 10, width = 21
+)
+```
+
+```{r plot_compare_gva_loss_square}
+plot_compare_gva_loss <-
+  ggplot(data_cost_output) +
+  stat_interval(
+    aes(
+      x = domain, y = cost,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 20, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(domain, cost)
+  ) +
+  facet_wrap(
+    vars(response),
+    labeller = labeller(
+      response = response_labels
+    )
+  ) +
+  scale_x_discrete(
+    labels = loss_measure_labels
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(
+      scale = 1e-3, prefix = "$",
+      suffix = " B", accuracy = 1
+    )
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = "Domain",
+    y = "Cumulative value lost (billion $)",
+    col = "Proj. interv.",
+    caption = "Valuation of losses from reduced GVA, reduced education, and deaths."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial")
+
+ggsave(
+  "../figures/plot_compare_gva_loss_square.png",
+  plot_compare_gva_loss,
+  height = 14, width = 14
+)
+```
+
+## Table: All-domain losses
+
+```{r table_cost_by_response}
+data_cost_output %>%
+  group_by(response, domain) %>%
+  reframe(fn_qtl(cost)) %>%
+  mutate(
+    response = case_when(
+      response == "none" ~ "unmitigated",
+      response == "economic_closures" ~ "business_closures",
+      response == "elimination" ~ "S+B closures",
+      .default = response
+    )
+  ) %>%
+  readr::write_csv(
+    file = "../tables/table_cost_by_response.csv"
+  )
+```
+
+## Economic losses: Absences
+
+```{r plot_compare_econ_cost_absences}
+plot_compare_econ_cost_absences <-
+  ggplot(data_econ_cost_absences) +
+  stat_interval(
+    aes(
+      response,
+      y = cost,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(response, y = cost)
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(
+      scale = 1, prefix = "$",
+      suffix = " M"
+    )
+  ) +
+  scale_x_discrete(
+    labels = response_labels,
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = NULL,
+    y = "Cumulative value lost (billion $)",
+    col = "Proj. interv.",
+    caption = "Economic losses from worker absences due to illness or death."
+  ) +
+  theme_bw(24, "Arial") +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  )
+
+ggsave(
+  "../figures/plot_compare_econ_cost_absences.png",
+  plot_compare_econ_cost_absences,
+  height = 7, width = 10
+)
+```
+
+## Economic losses: Closures
+
+```{r plot_compare_econ_cost_closures_square}
+plot_compare_econ_cost_closures <-
+  ggplot(data_econ_cost_closures) +
+  geom_col(
+    aes(response, cost, fill = response),
+    show.legend = FALSE
+  ) +
+  scale_x_discrete(
+    labels = response_labels,
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(
+      scale = 1e-3, prefix = "$",
+      suffix = " B", accuracy = 1
+    )
+  ) +
+  scale_fill_brewer(
+    palette = "Dark2"
+  ) +
+  labs(
+    x = NULL,
+    y = "Cumulative value lost (billion $)",
+    col = "Proj. interv.",
+    caption = "Economic losses from economic sector closures."
+  ) +
+  theme_bw(24, "Arial")
+
+ggsave(
+  "../figures/plot_compare_econ_cost_closures.png",
+  plot_compare_econ_cost_closures,
+  height = 7, width = 10
+)
+```
+
+## Table: Economic costs breakdown
+
+```{r table_econ_cost_breakdown}
+data_econ_costs %>%
+  group_by(response, cost_type) %>%
+  reframe(fn_qtl(cost)) %>%
+  mutate(
+    response = case_when(
+      response == "none" ~ "unmitigated",
+      response == "economic_closures" ~ "business_closures",
+      response == "elimination" ~ "S+B closures",
+      .default = response
+    )
+  ) %>%
+  readr::write_csv(
+    file = "../tables/table_econ_cost_breakdown.csv"
+  )
+```

@@ -6,7 +6,8 @@ make_materials <- function(
   disease = "sars_cov_1",
   r0 = 3.0,
   t0 = 30,
-  t_end = 100
+  horizon = 100,
+  n_samples = 10
 ) {
   cli::cli_inform(
     "Generating workshop materials at dir {.file {here::here()}}"
@@ -25,7 +26,11 @@ make_materials <- function(
   rmarkdown::render(
     file.path("handout", "handout.Rmd"),
     params = list(
-      country = country
+      country = country,
+      base_disease = disease,
+      t0 = t0,
+      horizon = horizon,
+      n_samples = n_samples
     )
   )
 
