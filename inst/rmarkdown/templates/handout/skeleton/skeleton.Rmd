@@ -1,6 +1,6 @@
 ---
 title: "Information Handout"
-author: Initiative for the Economics of Pandemic Preparedness (EPPI), Jameel Institute, Imperial College London
+author: Jameel Institute, Imperial College London
 date: "`r Sys.Date()`"
 output:
   bookdown::pdf_document2:
@@ -38,6 +38,10 @@ params:
     label: "Time horizon in days since the first case."
     value: 100
     input: numeric
+  n_samples:
+    label: "Number of parameter samples."
+    value: 10
+    input: numeric
 ---
 
 ```{r settings, echo = FALSE}
@@ -55,21 +59,41 @@ knitr::opts_chunk$set(
 showtext::showtext_auto()
 ```
 
+```{r make_output_dirs}
+# create directories
+fs::dir_create("figures")
+fs::dir_create("tables")
+```
+
 ```{r setup}
 library(daedalus)
 library(daedalus.compare)
+
 library(ggplot2)
 library(ggdist)
+
+library(dplyr)
+library(tidyr)
+library(purrr)
 ```
 
 ```{r params}
-country <- params$country
+country <- daedalus_country(params$country)
+country_name <- get_data(country, "name")
+
+disease <- params$base_disease
+infection <- daedalus_infection(disease) # to align with daedalus() arg names
+
+n_samples <- params$n_samples
+```
+
+```{r inject-projections, child="rmdchunks/projections.Rmd", echo=FALSE}
 ```
 
 # Section 1: Explanation of the exercise
 
-You are a government advisor in `r country`.
-There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country`.  
+You are a government advisor in `r country_name`.
+There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country_name`.  
 
 On day 30, every table needs to make a decision:
 
@@ -118,45 +142,49 @@ See the online dashboard, [Daedalus Explore](https://daedalus.jameel-institute.o
 
 ## Distribution of $R_0$
 
-```{r r0_distribution}
-disease <- params$base_disease
-disease_obj <- daedalus_infection(disease)
-r0 <- params$r0
-n_samples <- 100
-
-disease_samples <- make_infection_samples(
-  disease,
-  list(
-    r0 = distributional::dist_beta(2, 5)
-  ),
-  list(
-    r0 = sort(c(1.0, r0))
-  ),
-  n_samples
-)
-
-# r0 values
-r0_samples <- vapply(disease_samples, `[[`, numeric(1L), "r0")
-```
-
-```{r r0_dist_plot}
-fig <- ggplot() +
-  stat_histinterval(aes(r0_samples))
-
-fig
-
-ggsave("figure.png", fig)
-```
+![Distribution of R0](figures/figure.png)
 
 ## Distribution of hospitalisation rate
 
 ## Uncertainty in epidemic projections
 
+![](figures/plot_unmit_daily_cases_explainer.png)
+
+![](figures/plot_unmit_daily_cases.png)
+
 # Section 2: Epidemic projections under mitigation scenarios
 
 ## Projected epidemic outcomes for an unmitigated epidemic
 
-## Proejcted epidemic outcomes for mitigation scenarios
+![](figures/plot_unmit_daily_cases.png)
+
+![](figures/plot_unmit_daily_hospitalisations.png)
+
+![](figures/plot_unmit_total_hosp.png)
+
+![](figures/plot_unmit_daily_deaths.png)
+
+![](figures/plot_unmit_epi_summary.png)
+
+![](figures/plot_unmit_deaths_by_age.png)
+
+![](figures/plot_unmit_gva_loss.png)
+
+## Projected epidemic outcomes for mitigation scenarios
+
+![](figures/plot_compare_daily_cases_square.png)
+
+![](figures/plot_compare_daily_hospitalisations_square.png)
+
+![](figures/plot_compare_total_hosp_square.png)
+
+![](figures/plot_compare_daily_deaths_square.png)
+
+![](figures/plot_compare_epi_summary_square.png)
+
+![](figures/plot_compare_deaths_by_age_square.png)
+
+![](figures/plot_compare_gva_loss_square.png)
 
 # Section 3: Additional decision-making aids
 
