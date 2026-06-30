@@ -4,7 +4,7 @@ author: Jameel Institute, Imperial College London
 date: "`r Sys.Date()`"
 output:
   bookdown::pdf_document2:
-    documentclass: scrreprt
+    documentclass: scrbook
     toc-depth: 2
     secnumdepth: 2
     geometry: "left=5cm, right=5cm, top=2.5cm, bottom=2.5cm"
@@ -42,24 +42,16 @@ params:
     label: "Number of parameter samples."
     value: 10
     input: numeric
-  figures_out:
-    label: "Figures output path."
-    value: "figures"
-  tables_out:
-    label: "Tables output path."
-    value: "tables"
 ---
 
 ```{r settings, echo = FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
-  fig.width = 9,
-  fig.height = 5,
   dpi = 300,
   collapse = TRUE,
   message = FALSE,
   warning = FALSE,
-  out.width = "100%",
+  out.width = "70%",
   fig.showtext = TRUE
 )
 ```
@@ -67,6 +59,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(daedalus)
 library(daedalus.compare)
+library(daedalus.workshop)
 
 library(ggplot2)
 library(ggdist)
@@ -78,12 +71,12 @@ library(purrr)
 
 ```{r path_params}
 # TODO: move into calling function? should this overwrite file?
-figs_out <- params$figures_out
+figs_out <- fs::path_abs("figures")
 if (!dir.exists(figs_out)) {
   fs::dir_create(figs_out)
 }
 
-tables_out <- params$tables_out
+tables_out <- fs::path_abs("tables")
 if (!dir.exists(tables_out)) {
   fs::dir_create(tables_out)
 }
@@ -273,10 +266,24 @@ knitr::include_graphics(
 
 ## GVA and contacts for each economic sector
 
+```{r sector_gva_contacts}
+make_sector_table(country)
+```
+
 ## Risk of exceeding hospital capacity
+
+```{r risk_hosp_overflow}
+make_hcap_breaches_table(tables_out)
+```
 
 ## Median and limits of additional outcomes
 
-## Domain-specific costs
+### Deaths by age group
 
-## Economic costs due to closures and absences
+```{r deaths_age_group}
+make_deaths_by_age_table(tables_out)
+```
+
+### Domain-specific costs
+
+### Economic costs due to closures and absences

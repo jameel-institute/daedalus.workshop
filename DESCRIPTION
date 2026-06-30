@@ -28,5 +28,6 @@ Imports:
     cli,
     ggplot2,
     here,
+    kableExtra,
     purrr,
     revealjs
