@@ -14,6 +14,25 @@ make_materials(
   render = TRUE
 )
 }
+\arguments{
+\item{country}{description}
+
+\item{disease}{}
+
+\item{r0}{}
+
+\item{t0}{}
+
+\item{horizon}{}
+
+\item{n_samples}{}
+
+\item{render}{}
+}
+\value{
+Nothing; called only for side-effects of drafting and rendering
+Rmarkdown documents for real-time pandemic response workshop materials.
+}
 \description{
 Generates all workshop materials in the current working directory.
 }

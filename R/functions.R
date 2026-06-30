@@ -2,7 +2,22 @@
 #'
 #' Generates all workshop materials in the current working directory.
 #'
-#' @return
+#' @return Nothing; called only for side-effects of drafting and rendering
+#' Rmarkdown documents for real-time pandemic response workshop materials.
+#'
+#' @param country description
+#'
+#' @param disease
+#'
+#' @param r0
+#'
+#' @param t0
+#'
+#' @param horizon
+#'
+#' @param n_samples
+#'
+#' @param render
 #'
 #' @export
 make_materials <- function(
@@ -17,14 +32,6 @@ make_materials <- function(
   cli::cli_inform(
     "Generating workshop materials at dir {.file {here::here()}}"
   )
-
-  # makes figures - unsure if wanted
-  # make_projections(country, disease, r0, t0, t_end)
-  fig_path <- fs::path_abs("figures")
-  tables_path <- fs::path_abs("tables")
-
-  fs::dir_create(fig_path)
-  fs::dir_create(tables_path)
 
   # makes handout
   rmarkdown::draft(
@@ -43,9 +50,7 @@ make_materials <- function(
         base_disease = disease,
         t0 = t0,
         horizon = horizon,
-        n_samples = n_samples,
-        figures_out = fig_path,
-        tables_out = tables_path
+        n_samples = n_samples
       )
     )
   }
@@ -70,6 +75,8 @@ make_materials <- function(
 #' Theme for handout figures
 #'
 #' @return A `ggplot2` theme function that can be appended to a ggplot object.
+#'
+#' @export
 theme_eppi <- function() {
   ggplot2::theme_bw(base_size = 24, base_family = "Arial") +
     ggplot2::theme(
@@ -82,4 +89,70 @@ theme_eppi <- function() {
         linetype = "dashed"
       )
     )
+}
+
+#' Make table of sector GVA and contacts
+#' 
+#' @param country
+#' 
+#' @return A `knitr::kable` table.
+#' 
+#' @export
+make_sector_table <- function(country) {
+  country <- daedalus::daedalus_country(country)
+
+  gva <- daedalus::get_data(country, "gva")
+  contacts <- round(daedalus::get_data(country, "contacts_workplace"), 1L)
+
+  df <- tibble::tibble(
+    economic_sector = daedalus.data::econ_sector_names,
+    gva = gva,
+    contacts = contacts
+  )
+
+  col_names <- c(
+    "Economic sector",
+    "Daily GVA ($M)",
+    "Workplace contacts"
+  )
+
+  knitr::kable(df, col.names = col_names)
+}
+
+#' @export
+make_hcap_breaches_table <- function(tables_out) {
+  df <- get_table(FILE_HOSP_OVERFLOW_RISK, tables_out)
+  df$hcap_exceeded_pct <- scales::percent(hcap_exceeded_pct)
+
+  col_names <- c(
+    "Mitigation response strategy", "Hospital capacity exceeded (%)"
+  )
+
+  knitr::kable(df, col.names = col_names)
+}
+
+#' @export
+make_deaths_by_age_table <- function(tables_out) {
+  df <- get_table(FILE_DEATHS_BY_AGE, tables_out)
+
+  df <- dplyr::mutate(
+    df,
+    response = dplyr::case_when(
+      response == "unmitigated" ~ NAMES_PRECANNED_NPIS["unmitigated"],
+      response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
+      response == "business_closures" ~ 
+        NAMES_PRECANNED_NPIS["business_closures"],
+      response == "S+B closures" ~ NAMES_PRECANNED_NPIS["S+B closures"]
+    )
+  )
+
+  col_names <- c(
+    "Mitigation response strategy",
+    "Age group",
+    "Median (50th percentile)",
+    "25th percentile",
+    "75th percentile"
+  )
+
+  knitr::kable(df, col.names = col_names)
 }
