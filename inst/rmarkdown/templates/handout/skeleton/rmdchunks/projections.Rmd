@@ -5,16 +5,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r run-models}
-output <- daedalus(country, disease)
-
-print(output)
-
-print(get_epidemic_summary(output))
-```
-
-## REMOVE HEADING - REAL PROJECTIONS HERE
-
 ```{r plot_labels}
 x_label_days <- "Days after first detected case"
 measure_levels <- c(
@@ -275,9 +265,9 @@ data_econ_cost_absences <- filter(
 )
 ```
 
-# Unmitigated pandemic
+<!-- # Unmitigated pandemic -->
 
-## Epidemic projections
+<!-- ## Epidemic projections -->
 
 ```{r curve_labels}
 curve_measure_labels <- c(
@@ -287,7 +277,7 @@ curve_measure_labels <- c(
 )
 ```
 
-### Daily infections: Explainer
+<!-- ### Daily infections: Explainer -->
 
 ```{r plot_daily_cases_unmit_explainer}
 plot_daily_cases_unmit_explainer <-
@@ -320,7 +310,7 @@ plot_daily_cases_unmit_explainer <-
   theme_bw(base_size = 24, base_family = "Arial")
 
 ggsave(
-  "../figures/plot_unmit_daily_cases_explainer.png",
+  file.path(figs_out, "plot_unmit_daily_cases_explainer.png"),
   plot_daily_cases_unmit_explainer,
   height = 7, width = 10
 )
@@ -365,12 +355,12 @@ plot_daily_infections_unmit <-
   theme_bw(base_size = 24, base_family = "Arial")
 
 ggsave(
-  "../figures/DO_NOT_SHOW_unmit_daily_infections.png",
+  file.path(figs_out, "DO_NOT_SHOW_unmit_daily_infections.png"),
   plot_daily_infections_unmit, height = 7, width = 10
 )
 ```
 
-### Daily reported cases
+<!-- ### Daily reported cases -->
 
 ```{r plot_daily_cases_unmit}
 plot_daily_cases_unmit <-
@@ -414,7 +404,7 @@ plot_daily_cases_unmit <-
   theme_bw(base_size = 24, base_family = "Arial")
 
 ggsave(
-  "../figures/plot_unmit_daily_cases.png",
+  file.path(figs_out, "plot_unmit_daily_cases.png"),
   plot_daily_cases_unmit, height = 7, width = 10
 )
 ```
@@ -424,8 +414,8 @@ measures <- c("daily_deaths", "daily_hospitalisations", "total_hosp")
 reporting_rates <- c(death_reporting, hosp_reporting, hosp_reporting)
 
 pwalk(
-  measures, curve_measure_labels, reporting_rates,
-  f = function(m, l, reporting) {
+  list(measures, curve_measure_labels, reporting_rates),
+  .f = function(m, l, reporting) {
     plot_epi_curves_unmit <-
       ggplot() +
       geom_line(
@@ -474,7 +464,7 @@ pwalk(
         )
     }
 
-    filename <- glue::glue("../figures/plot_unmit_{m}.png")
+    filename <- glue::glue(file.path(figs_out, "plot_unmit_{m}.png"))
     ggsave(
       filename,
       plot = plot_epi_curves_unmit,
@@ -484,7 +474,7 @@ pwalk(
 )
 ```
 
-## Infections, hospital demand, deaths
+<!-- ## Infections, hospital demand, deaths -->
 
 ```{r epi_unmit_summary}
 data_epi_summary_unmit <- filter(
@@ -551,13 +541,13 @@ plot_unmit_epi_summary <-
   theme(axis.text.x = element_blank())
 
 ggsave(
-  "../figures/plot_unmit_epi_summary.png",
+  file.path(figs_out, "plot_unmit_epi_summary.png"),
   plot = plot_unmit_epi_summary,
   height = 7, width = 10
 )
 ```
 
-## Deaths by age group
+<!-- ## Deaths by age group -->
 
 ```{r plot_unmit_deaths_by_age}
 plot_unmit_deaths_by_age <-
@@ -606,13 +596,13 @@ plot_unmit_deaths_by_age <-
   )
 
 ggsave(
-  "../figures/plot_unmit_deaths_by_age.png",
+  file.path(figs_out, "plot_unmit_deaths_by_age.png"),
   plot_unmit_deaths_by_age,
   height = 7, width = 10
 )
 ```
 
-### CFR by age group
+<!-- ### CFR by age group -->
 
 ```{r plot_cfr_by_age}
 plot_cfr_by_age <-
@@ -661,13 +651,13 @@ plot_cfr_by_age <-
   )
 
 ggsave(
-  "../figures/plot_unmit_cfr_by_age.png",
+  file.path(figs_out, "plot_unmit_cfr_by_age.png"),
   plot_cfr_by_age,
   height = 7, width = 10
 )
 ```
 
-## Lost life years, future earnings, and GVA
+<!-- ## Lost life years, future earnings, and GVA -->
 
 ```{r data_cost_output_unmit}
 data_cost_output_unmit <- filter(
@@ -727,15 +717,15 @@ plot_unmit_gva_loss <-
   theme_bw(24, "Arial")
 
 ggsave(
-  "../figures/plot_unmit_gva_loss.png",
+  file.path(figs_out, "plot_unmit_gva_loss.png"),
   plot_unmit_gva_loss,
   height = 7, width = 10
 )
 ```
 
-# Mitigation measures
+<!-- # Mitigation measures -->
 
-## Epidemic projections
+<!-- ## Epidemic projections -->
 
 ```{r curve_measure_labels}
 curve_measure_labels <- c(
@@ -761,8 +751,8 @@ measures <- c(
 )
 
 pwalk(
-  measures, curve_measure_labels,
-  f = function(m, l) {
+  list(measures, curve_measure_labels),
+  .f = function(m, l) {
     plot_epi_curves_compare <-
       ggplot() +
       geom_line(
@@ -828,7 +818,7 @@ pwalk(
       m <- "daily_cases"
     }
 
-    filename <- glue::glue("../figures/plot_compare_{m}.png")
+    filename <- glue::glue(file.path(figs_out, "plot_compare_{m}.png"))
     ggsave(
       filename,
       plot = plot_epi_curves_compare,
@@ -840,8 +830,8 @@ pwalk(
 
 ```{r plot_scenario_curves_square}
 pwalk(
-  measures, curve_measure_labels,
-  f = function(m, l) {
+  list(measures, curve_measure_labels),
+  .f = function(m, l) {
     plot_epi_curves_compare <-
       ggplot() +
       geom_line(
@@ -907,7 +897,7 @@ pwalk(
       m <- "daily_cases"
     }
 
-    filename <- glue::glue("../figures/plot_compare_{m}_square.png")
+    filename <- file.path(figs_out, glue::glue("plot_compare_{m}_square.png"))
     ggsave(
       filename,
       plot = plot_epi_curves_compare,
@@ -917,7 +907,7 @@ pwalk(
 )
 ```
 
-## Infections, hospital demand, deaths
+<!-- ## Infections, hospital demand, deaths -->
 
 ```{r plot_compare_epi_summary}
 # plot uncertainty in epi outcomes
@@ -978,7 +968,7 @@ plot_compare_epi_summary <-
   ) +
   theme_bw(24, "Arial")
 
-filename <- glue::glue("../figures/plot_compare_epi_summary.png")
+filename <- glue::glue(file.path(figs_out, "plot_compare_epi_summary.png"))
 ggsave(
   filename,
   plot = plot_compare_epi_summary,
@@ -986,7 +976,7 @@ ggsave(
 )
 ```
 
-## Table: Hospital capacity breaches
+<!-- ## Table: Hospital capacity breaches -->
 
 ```{r table_hcap_breaches}
 data_epi_curve %>%
@@ -999,11 +989,11 @@ data_epi_curve %>%
     hcap_exceeded_pct = sum(max(value) > hcap)
   ) %>%
   readr::write_csv(
-    "../tables/table_hcap_breaches.csv"
+    file = file.path(tables_out, "table_hcap_breaches.csv")
   )
 ```
 
-## Deaths by age group
+<!-- ## Deaths by age group -->
 
 ```{r plot_compare_deaths_by_age}
 plot_compare_deaths_by_age <-
@@ -1064,7 +1054,7 @@ plot_compare_deaths_by_age <-
   theme_bw(24, "Arial")
 
 ggsave(
-  "../figures/plot_compare_deaths_by_age.png",
+  file.path(figs_out, "plot_compare_deaths_by_age.png"),
   plot_compare_deaths_by_age,
   height = 10, width = 25
 )
@@ -1129,13 +1119,13 @@ plot_compare_deaths_by_age <-
   theme_bw(24, "Arial")
 
 ggsave(
-  "../figures/plot_compare_deaths_by_age_square.png",
+  file.path(figs_out, "plot_compare_deaths_by_age_square.png"),
   plot_compare_deaths_by_age,
   height = 14, width = 14
 )
 ```
 
-## Table: Deaths by age
+<!-- ## Table: Deaths by age -->
 
 ```{r fn_qtl}
 fn_qtl <- function(x, probs = c(0.5, 0.25, 0.75)) {
@@ -1160,11 +1150,11 @@ data_deaths %>%
     )
   ) %>%
   readr::write_csv(
-    file = "../tables/table_deaths_by_age.csv"
+    file = file.path(tables_out, "table_deaths_by_age.csv")
   )
 ```
 
-## Lost life years, future earnings, and GVA
+<!-- ## Lost life years, future earnings, and GVA -->
 
 ```{r plot_compare_gva_loss}
 plot_compare_gva_loss <-
@@ -1218,7 +1208,7 @@ plot_compare_gva_loss <-
   theme_bw(24, "Arial")
 
 ggsave(
-  "../figures/plot_compare_gva_loss.png",
+  file.path(figs_out, "plot_compare_gva_loss.png"),
   plot_compare_gva_loss,
   height = 10, width = 21
 )
@@ -1276,13 +1266,13 @@ plot_compare_gva_loss <-
   theme_bw(24, "Arial")
 
 ggsave(
-  "../figures/plot_compare_gva_loss_square.png",
+  file.path(figs_out, "plot_compare_gva_loss_square.png"),
   plot_compare_gva_loss,
   height = 14, width = 14
 )
 ```
 
-## Table: All-domain losses
+<!-- ## Table: All-domain losses -->
 
 ```{r table_cost_by_response}
 data_cost_output %>%
@@ -1297,11 +1287,11 @@ data_cost_output %>%
     )
   ) %>%
   readr::write_csv(
-    file = "../tables/table_cost_by_response.csv"
+    file = file.path(tables_out, "table_cost_by_response.csv")
   )
 ```
 
-## Economic losses: Absences
+<!-- ## Economic losses: Absences -->
 
 ```{r plot_compare_econ_cost_absences}
 plot_compare_econ_cost_absences <-
@@ -1351,13 +1341,13 @@ plot_compare_econ_cost_absences <-
   )
 
 ggsave(
-  "../figures/plot_compare_econ_cost_absences.png",
+  file.path(figs_out, "plot_compare_econ_cost_absences.png"),
   plot_compare_econ_cost_absences,
   height = 7, width = 10
 )
 ```
 
-## Economic losses: Closures
+<!-- ## Economic losses: Closures -->
 
 ```{r plot_compare_econ_cost_closures_square}
 plot_compare_econ_cost_closures <-
@@ -1388,13 +1378,13 @@ plot_compare_econ_cost_closures <-
   theme_bw(24, "Arial")
 
 ggsave(
-  "../figures/plot_compare_econ_cost_closures.png",
+  file.path(figs_out, "plot_compare_econ_cost_closures.png"),
   plot_compare_econ_cost_closures,
   height = 7, width = 10
 )
 ```
 
-## Table: Economic costs breakdown
+<!-- ## Table: Economic costs breakdown -->
 
 ```{r table_econ_cost_breakdown}
 data_econ_costs %>%
@@ -1409,6 +1399,6 @@ data_econ_costs %>%
     )
   ) %>%
   readr::write_csv(
-    file = "../tables/table_econ_cost_breakdown.csv"
+    file = file.path(tables_out, "table_econ_cost_breakdown.csv")
   )
 ```

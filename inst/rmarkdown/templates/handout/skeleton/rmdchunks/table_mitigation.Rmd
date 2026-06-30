@@ -1,0 +1,52 @@
+
+```{=latex}
+\begin{sidewaystable}
+\centering
+\caption{Government mitigation strategies (choose one)}
+\label{tbl:mitigation}
+\begin{tabular}{p{2.5cm}p{6.5cm}p{3cm}p{5.5cm}p{5cm}}
+\toprule
+\textbf{Strategy} &
+\textbf{Explanation} &
+\textbf{Health losses} &
+\textbf{Economic losses} &
+\textbf{Educational losses} \\
+\midrule
+\textbf{No Closures} &
+  There are no closures of businesses or schools &
+  Years of lives lost &
+  Sickness absences and deaths &
+  Sickness absences and deaths of teachers\textsuperscript{1} \\
+\midrule
+\textbf{Business closures (light)} &
+  Economic sectors are closed to varying but pre-set percentages\textsuperscript{2} &
+  Years of lives lost &
+  \% GVA reductions compared to pre-pandemic GVA of 45 economic sectors; sickness absences and deaths &
+  Sickness absences and deaths of teachers\textsuperscript{1} \\
+\midrule
+\textbf{School closures (severe) + business closures (light)} &
+  Educational institutions are closed for in-person schooling; there is online schooling of lower efficacy, reflecting data on digital access for the UK; there are some business closures, to varying but pre-set percentages\textsuperscript{2} &
+  Years of lives lost &
+  \% GVA reductions compared to pre-pandemic GVA of 45 economic sectors; sickness absences and deaths &
+  Future earning losses of students due to interrupted schooling; sickness absences and deaths of teachers\textsuperscript{1} \\
+\midrule
+\textbf{School and business closures (severe)} &
+  Economic sectors are closed to varying but pre-set percentages; sector closures more stringent than under business closures\textsuperscript{2} &
+  Years of lives lost &
+  \% GVA reductions compared to pre-pandemic GVA of 45 economic sectors; sickness absences and deaths &
+  Future earning losses of students due to interrupted schooling; sickness absences and deaths of teachers\textsuperscript{1} \\
+\midrule
+\textbf{Bespoke closure strategy} &
+  Participants can choose whether and by how much education and economic sectors are closed; there is an essential level of production below which sectors cannot be closed &
+  Years of lives lost &
+  \% GVA reductions compared to pre-pandemic GVA of 45 economic sectors; sickness absences and deaths &
+  Losses as above; depend on whether and how much education sector is closed \\
+\bottomrule
+\end{tabular}
+
+\footnotesize
+\noindent\textsuperscript{1}Educational loss due to sickness and death of teachers is based on education sector GVA.
+\textsuperscript{2}Sector closures are informed by data from various countries observed during 2020. GVA = Gross value added; the contribution of an economic sector to economic output.
+\normalsize
+\end{sidewaystable}
+```

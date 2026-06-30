@@ -8,8 +8,8 @@ output:
     toc-depth: 2
     secnumdepth: 2
     geometry: "left=5cm, right=5cm, top=2.5cm, bottom=2.5cm"
-header-includes:
-  - \usepackage{tgtermes}
+    number_sections: true
+    extra_dependencies: ["tgtermes", "rotating", "booktabs"]
 link-citations: true
 params:
   workshop_name:
@@ -42,6 +42,12 @@ params:
     label: "Number of parameter samples."
     value: 10
     input: numeric
+  figures_out:
+    label: "Figures output path."
+    value: "figures"
+  tables_out:
+    label: "Tables output path."
+    value: "tables"
 ---
 
 ```{r settings, echo = FALSE}
@@ -56,13 +62,6 @@ knitr::opts_chunk$set(
   out.width = "100%",
   fig.showtext = TRUE
 )
-showtext::showtext_auto()
-```
-
-```{r make_output_dirs}
-# create directories
-fs::dir_create("figures")
-fs::dir_create("tables")
 ```
 
 ```{r setup}
@@ -75,6 +74,19 @@ library(ggdist)
 library(dplyr)
 library(tidyr)
 library(purrr)
+```
+
+```{r path_params}
+# TODO: move into calling function? should this overwrite file?
+figs_out <- params$figures_out
+if (!dir.exists(figs_out)) {
+  fs::dir_create(figs_out)
+}
+
+tables_out <- params$tables_out
+if (!dir.exists(tables_out)) {
+  fs::dir_create(tables_out)
+}
 ```
 
 ```{r params}
@@ -90,7 +102,7 @@ n_samples <- params$n_samples
 ```{r inject-projections, child="rmdchunks/projections.Rmd", echo=FALSE}
 ```
 
-# Section 1: Explanation of the exercise
+# Explanation of the exercise
 
 You are a government advisor in `r country_name`.
 There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country_name`.  
@@ -146,46 +158,125 @@ See the online dashboard, [Daedalus Explore](https://daedalus.jameel-institute.o
 
 ## Distribution of hospitalisation rate
 
+## Mitigation strategies
+
+See table 2 in this handout for more information on economic productivity and workplace contacts.
+
+```{r inject-table, child="rmdchunks/table_mitigation.Rmd", echo=FALSE}
+```
+
 ## Uncertainty in epidemic projections
 
-![](figures/plot_unmit_daily_cases_explainer.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_daily_cases_explainer.png")
+)
+```
 
-![](figures/plot_unmit_daily_cases.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_daily_cases.png")
+)
+```
 
-# Section 2: Epidemic projections under mitigation scenarios
+# Epidemic projections under mitigation scenarios
 
 ## Projected epidemic outcomes for an unmitigated epidemic
 
-![](figures/plot_unmit_daily_cases.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_daily_cases.png")
+)
+```
 
-![](figures/plot_unmit_daily_hospitalisations.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_daily_hospitalisations.png")
+)
+```
 
-![](figures/plot_unmit_total_hosp.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_total_hosp.png")
+)
+```
 
-![](figures/plot_unmit_daily_deaths.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_daily_deaths.png")
+)
+```
 
-![](figures/plot_unmit_epi_summary.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_epi_summary.png")
+)
+```
 
-![](figures/plot_unmit_deaths_by_age.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_deaths_by_age.png")
+)
+```
 
-![](figures/plot_unmit_gva_loss.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_unmit_gva_loss.png")
+)
+```
 
 ## Projected epidemic outcomes for mitigation scenarios
 
-![](figures/plot_compare_daily_cases_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_daily_cases_square.png")
+)
+```
 
-![](figures/plot_compare_daily_hospitalisations_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_daily_hospitalisations_square.png")
+)
+```
 
-![](figures/plot_compare_total_hosp_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_total_hosp_square.png")
+)
+```
 
-![](figures/plot_compare_daily_deaths_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_daily_deaths_square.png")
+)
+```
 
-![](figures/plot_compare_epi_summary_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_epi_summary.png")
+)
+```
 
-![](figures/plot_compare_deaths_by_age_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_deaths_by_age_square.png")
+)
+```
 
-![](figures/plot_compare_gva_loss_square.png)
+```{r}
+knitr::include_graphics(
+  file.path(figs_out, "plot_compare_gva_loss_square.png")
+)
+```
 
 # Section 3: Additional decision-making aids
 
-### subs-sub section
+## GVA and contacts for each economic sector
+
+## Risk of exceeding hospital capacity
+
+## Median and limits of additional outcomes
+
+## Domain-specific costs
+
+## Economic costs due to closures and absences

@@ -10,7 +10,8 @@ make_materials(
   r0 = 3,
   t0 = 30,
   horizon = 100,
-  n_samples = 10
+  n_samples = 10,
+  render = TRUE
 )
 }
 \description{
