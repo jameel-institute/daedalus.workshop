@@ -49,3 +49,6 @@ po/*~
 rsconnect/
 inst/doc
 docs
+
+# rendered docs
+handout/

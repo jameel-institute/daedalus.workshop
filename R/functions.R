@@ -102,11 +102,18 @@ make_sector_table <- function(country) {
   country <- daedalus::daedalus_country(country)
 
   gva <- daedalus::get_data(country, "gva")
+  gva_display <- scales::comma(gva, 1)
+
+  gva_display[gva < 1] <- scales::comma(gva[gva < 1], 0.1)
+
   contacts <- round(daedalus::get_data(country, "contacts_workplace"), 1L)
 
+  sector_names <- daedalus.data::econ_sector_names
+  sector_names[45L] <- "Activities of households as employers"
+
   df <- tibble::tibble(
-    economic_sector = daedalus.data::econ_sector_names,
-    gva = gva,
+    economic_sector = sector_names,
+    gva = gva_display,
     contacts = contacts
   )
 
@@ -122,7 +129,18 @@ make_sector_table <- function(country) {
 #' @export
 make_hcap_breaches_table <- function(tables_out) {
   df <- get_table(FILE_HOSP_OVERFLOW_RISK, tables_out)
-  df$hcap_exceeded_pct <- scales::percent(hcap_exceeded_pct)
+  df$hcap_exceeded_pct <- scales::percent(df$hcap_exceeded_pct)
+
+  df <- dplyr::mutate(
+    df,
+    response = dplyr::case_when(
+      response == "none" ~ NAMES_PRECANNED_NPIS["unmitigated"],
+      response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
+      response == "economic_closures" ~ 
+        NAMES_PRECANNED_NPIS["business_closures"],
+      response == "elimination" ~ NAMES_PRECANNED_NPIS["S+B closures"]
+    )
+  )
 
   col_names <- c(
     "Mitigation response strategy", "Hospital capacity exceeded (%)"
@@ -146,6 +164,8 @@ make_deaths_by_age_table <- function(tables_out) {
     )
   )
 
+  df <- df_cols_with_commas(df)
+
   col_names <- c(
     "Mitigation response strategy",
     "Age group",
@@ -155,4 +175,89 @@ make_deaths_by_age_table <- function(tables_out) {
   )
 
   knitr::kable(df, col.names = col_names)
+}
+
+#' @export
+make_domain_costs_table <- function(tables_out) {
+  df <- get_table(FILE_COST_BY_RESPONSE, tables_out)
+
+  df <- dplyr::mutate(
+    df,
+    response = dplyr::case_when(
+      response == "unmitigated" ~ NAMES_PRECANNED_NPIS["unmitigated"],
+      response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
+      response == "business_closures" ~ 
+        NAMES_PRECANNED_NPIS["business_closures"],
+      response == "S+B closures" ~ NAMES_PRECANNED_NPIS["S+B closures"]
+    ),
+    domain = dplyr::case_when(
+      domain == "economic" ~ "Economic",
+      domain == "education" ~ "Education",
+      domain == "lfie_value" ~ "Life years"
+    )
+  )
+
+  df <- df_cols_with_commas(df)
+
+  col_names <- c(
+    "Mitigation response strategy",
+    "Cost domain",
+    "Median (50th percentile)",
+    "25th percentile",
+    "75th percentile"
+  )
+
+  knitr::kable(df, col.names = col_names)
+}
+
+#' @export
+make_econ_cost_table <- function(tables_out) {
+  df <- get_table(FILE_ECON_COST_BREAKDOWN, tables_out)
+
+  df <- dplyr::mutate(
+    df,
+    response = dplyr::case_when(
+      response == "unmitigated" ~ NAMES_PRECANNED_NPIS["unmitigated"],
+      response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
+      response == "business_closures" ~ 
+        NAMES_PRECANNED_NPIS["business_closures"],
+      response == "S+B closures" ~ NAMES_PRECANNED_NPIS["S+B closures"]
+    ),
+    cost_type = dplyr::case_when(
+      cost_type == "economic_cost_closures" ~ "Closures",
+      cost_type == "economic_cost_absences" ~ "Absences"
+    )
+  )
+
+  df <- df_cols_with_commas(df)
+
+  col_names <- c(
+    "Mitigation response strategy",
+    "Cost type",
+    "Median (50th percentile)",
+    "25th percentile",
+    "75th percentile"
+  )
+
+  knitr::kable(df, col.names = col_names)
+}
+
+#' @export
+df_cols_with_commas <- function(df) {
+  # assumes data frame has cols "pctl_50" etc
+
+  df <- dplyr::mutate(
+    df,
+    dplyr::across(
+      dplyr::matches("pctl"),
+      function(x) {
+        x_disp <- scales::comma(x, 1)
+        x_disp[x < 1] <- scales::comma(x[x < 1], 0.1)
+
+        x_disp
+      }
+    )
+  )
+
+  df
 }
