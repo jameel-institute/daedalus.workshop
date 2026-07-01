@@ -49,12 +49,18 @@ pak::pak("jameel-institute/daedalus.workshop")
 
 ## Quick start
 
-WIP.
+_daedalus.workshop_ can be used with the main function, `make_materials()`, which prepares directories and workshop-relevant outputs in the current working directory.
+
+```r
+# code not run
+# supports some country parameters
+make_materials(
+  country = "GBR", disease = "influenza_2009", r0 = 3.0,
+  t0 = 30, horizon = 100,
+  n_samples = 25
+)
+```
 
 ## Related projects
 
-- _daedalus_ and family of packages for integrated epidemiological-economic modelling
-
-## References
-
-Space for references: REMOVE this text.
+- [_daedalus_](https://github.com/jameel-institute/daedalus.git) and family of packages for integrated epidemiological-economic modelling.

@@ -9,6 +9,7 @@ output:
     secnumdepth: 2
     geometry: "left=5cm, right=5cm, top=2.5cm, bottom=2.5cm"
     number_sections: true
+    fig_caption: true
     extra_dependencies: ["tgtermes", "rotating", "booktabs"]
 link-citations: true
 params:
@@ -90,6 +91,10 @@ disease <- params$base_disease
 infection <- daedalus_infection(disease) # to align with daedalus() arg names
 
 n_samples <- params$n_samples
+
+t0 <- params$t0
+horizon <- params$horizon
+t_diff <- horizon - t0
 ```
 
 ```{r inject-projections, child="rmdchunks/projections.Rmd", echo=FALSE}
@@ -97,18 +102,18 @@ n_samples <- params$n_samples
 
 # Explanation of the exercise
 
-You are a government advisor in `r country_name`.
-There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country_name`.  
+You are a government advisor in **`r country_name`**.
+There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country_name`.
 
-On day 30, every table needs to make a decision:
+On **day `r t0`**, every table needs to make a decision:
 
 - Should we implement closures? 
 - Should we close businesses, while leaving schools open?
-- Or close both businesses and schools? Shall we implement this now, or on any day over the next 70 days?
+- Or close both businesses and schools? Shall we implement this now, or on any day over the next **`r t_diff`** days?
 - You can choose amongst several strategies, ranging in stringency (see table 1).
 
-The Imperial team presents you with projections of the health and economic outcomes of different strategies for the next 100 days.
-They use Imperial’s DAEDALUS model for the projections (see page 5).
+The Imperial team presents you with projections of the health and economic outcomes of different strategies for the next `r t_diff` days.
+They use Imperial’s DAEDALUS model for the projections.
 Before the coffee break, your table needs to commit to one strategy, and note it down on the response strategy form. 
 
 There is considerable uncertainty surrounding the outcomes from each strategy (see figure 1B). 
@@ -116,12 +121,28 @@ There is considerable uncertainty surrounding the outcomes from each strategy (s
 After the coffee break, every table needs to briefly explain their chosen strategy.
 Our senior decision makers choose the strategy they want to implement.  
 
-On Day 100, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next 100 days.
+On **Day `r horizon`**, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next 100 days.
 The team also presents outcomes for one alternative strategy. 
 
 The workshop concludes with a discussion of the choices and the use of modelling in making tough trade-offs during early outbreaks.
 
+## Explanation of exercise timeline
+
+### Initial projections
+
+**TODO: ADD DIAGRAM**
+
+### Uncertainty around outcomes under chosen response
+
+**TODO: ADD DIAGRAM**
+
+### Phase 2: Outcomes under chosen response
+
+**TODO: ADD DIAGRAM**
+
 ## The Daedalus Model
+
+**TODO: ADD MODEL SCHEMATIC**
 
 DAEDALUS models infection transmissions within the community, the economy, and during travel between these places.
 
@@ -147,9 +168,26 @@ See the online dashboard, [Daedalus Explore](https://daedalus.jameel-institute.o
 
 ## Distribution of $R_0$
 
-![Distribution of R0](figures/figure.png)
+```{r plot-r0-dist}
+#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
+#| shown below. Higher bars above values indicate that those values are more
+#| likely."
+
+knitr::include_graphics(
+  file.path(figs_out, "plot_dist_r0.png")
+)
+```
 
 ## Distribution of hospitalisation rate
+
+```{r plot-eta-dist}
+#| fig.cap: "Distribution of the mean hospitalisation rate. The true
+#| hospitalisation rate cannot be known, and may vary between age groups."
+
+knitr::include_graphics(
+  file.path(figs_out, "plot_dist_eta.png")
+)
+```
 
 ## Mitigation strategies
 
@@ -160,13 +198,20 @@ See table 2 in this handout for more information on economic productivity and wo
 
 ## Uncertainty in epidemic projections
 
-```{r}
+We summarise newly detected cases by highlighting the median curve and shading the areas covering 50% and 95% of curves closest to the median.
+These are the 50% and 95% projection intervals. 
+
+```{r explainer-raw}
+#| fig.cap: "WIP"
+#| 
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_cases_explainer.png")
 )
 ```
 
-```{r}
+```{r explainer-shaded}
+#| fig.cap: "WIP"
+#| 
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_cases.png")
 )
@@ -177,42 +222,53 @@ knitr::include_graphics(
 ## Projected epidemic outcomes for an unmitigated epidemic
 
 ```{r}
+#| fig.cap: "WIP"
+#|
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_cases.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
+#| 
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_hospitalisations.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
+#| 
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_total_hosp.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
+#| 
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_deaths.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_epi_summary.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_deaths_by_age.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_gva_loss.png")
 )
@@ -221,42 +277,49 @@ knitr::include_graphics(
 ## Projected epidemic outcomes for mitigation scenarios
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_cases_square.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_hospitalisations_square.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_total_hosp_square.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_deaths_square.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_epi_summary.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_deaths_by_age_square.png")
 )
 ```
 
 ```{r}
+#| fig.cap: "WIP"
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_gva_loss_square.png")
 )
@@ -284,6 +347,14 @@ make_hcap_breaches_table(tables_out)
 make_deaths_by_age_table(tables_out)
 ```
 
-### Domain-specific costs
+### Domain-specific costs (millions USD)
 
-### Economic costs due to closures and absences
+```{r domain_specific_costs}
+make_deaths_by_age_table(tables_out)
+```
+
+### Economic costs due to closures and absences (millions USD)
+
+```{r econ_costs_breakdown}
+make_econ_cost_table(tables_out)
+```

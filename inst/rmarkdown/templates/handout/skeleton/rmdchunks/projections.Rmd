@@ -50,7 +50,7 @@ hfr <- get_data(disease_x, "hfr")
 hfr <- mean(hfr) * severity_profile * 10
 ```
 
-```{r disease_list}
+```{r infection_samples}
 # make list of infection objects
 disease_list <- Map(
   r0_samples,
@@ -65,19 +65,56 @@ disease_list <- Map(
 disease_tags <- glue::glue("sample_{seq_along(disease_list)}")
 ```
 
-```{r infection_samples}
-# make list of infection objects
-disease_list <- Map(
-  r0_samples,
-  f = function(x, y) {
-    daedalus_infection(
-      "influenza_2009",
-      r0 = x,
-      hfr = hfr
-    )
-  }
+```{r plot_r0}
+plot_r0 <- ggplot() +
+  stat_histinterval(
+    aes(
+      r0_samples, fill = after_stat(level)
+    ),
+    limits = c(0.5, 1.0)
+  ) +
+    scale_fill_viridis_d(na.translate = FALSE) +
+    theme_bw() +
+    theme_eppi() +
+    theme(
+      axis.text = element_text(size = 18),
+      axis.title = element_text(size = 18)
+    ) +
+      labs(
+        x = "R0", y = "Density", fill = "Confidence interval"
+      )
+
+ggsave(
+  file.path(figs_out, "plot_dist_r0.png"),
+  plot_r0, height = 7, width = 10
 )
-disease_tags <- glue::glue("sample_{seq_along(disease_list)}")
+```
+
+```{r plot_eta}
+eta_means <- vapply(disease_list, function(x) mean(x$eta), numeric(1))
+plot_eta <- ggplot() +
+  stat_histinterval(
+    aes(
+      eta_means, fill = after_stat(level)
+    ),
+    limits = c(0.5, 1.0)
+  ) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_fill_viridis_d(na.translate = FALSE) +
+    theme_bw() +
+    theme_eppi() +
+    theme(
+      axis.text = element_text(size = 18),
+      axis.title = element_text(size = 18)
+    ) +
+      labs(
+        x = "Hospital admission %", y = "Density", fill = "Confidence interval"
+      )
+
+ggsave(
+  file.path(figs_out, "plot_dist_eta.png"),
+  plot_eta, height = 7, width = 10
+)
 ```
 
 ```{r timepoints}
