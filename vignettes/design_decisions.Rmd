@@ -14,6 +14,57 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(daedalus.workshop)
-```
+This vignette explains the design of _daedalus.workshop_.
+
+## Big picture
+
+This package addresses the need to periodically generate materials for interactive pandemic-response workshops conducted by the Jameel Institute, using the Daedalus family of integrated epi-econ models.
+
+These workshops have a range of attendees, who are expected to make pandemic response decisions based on projections of the impact of a hypothetical outbreak.
+Outbreak projections are generated using the _daedalus_ and _daedalus.compare_ packages.
+The exercise is typically divided into three phases:
+
+1. Phase 1: An initial presentation introducing the outbreak setting (usually the country in which the workshop is being held), a distribution of outbreak parameters (usually the $R_0$), and the projected outcomes for an unmitigated epidemic over an initial time horizon;
+
+2. Phase 2: A group discussion and decision phase where participants decide their group's response strategy. In practice this is the duration and stringency of NPIs in the form of closures. A central decision making figure selects a strategy from among those submitted, or a hybrid of two or more strategies;
+
+3. Phase 3 (also called phase 2): A final presentation comparing the epidemic outcomes under the chosen strategy to those for an unmitigated epidemic.
+
+Between phase 1 and 2, participants are also handed an information pack that shows projected outcomes for a few key, 'pre-canned' NPIs as available on the [Daedalus Explore dashboard](https://daedalus.jameel-institute.org/).
+
+The current way of generating these materials is the copying and editing of materials used in previous workshops, which is slow and prone to errors.
+
+This package chiefly aims to automate the generation of the information pack.
+Figures from the information pack are also used in the phase 1 presentation.
+
+The package is also aimed at generating the outlines of the final phase 2 presentation.
+This presentation is partially live-coded during the workshop, as the chosen strategy is provided by the participants.
+However, it contains a plausible response strategy that is intended to serve as a placeholder that can be easily replaced.
+
+## Materials as Rmarkdown templates
+
+This package provides [Rmarkdown templates](https://pkg.yihui.org/rmarkdown-book/document-templates) in `inst/rmarkdown/templates`.
+It was initially intended to use Quarto templates, but Quarto does not offer integration with RStudio to easily generate files from a template; so Rmarkdown templates are provided instead.
+This choice is open to reconsideration.
+
+### Structure of templates
+
+Templates are [structured as expected for Rmarkdown templates](https://pkg.yihui.org/rmarkdown-book/template-structure).
+
+### Use of template expansion over parameters
+
+Rmarkdown documents can be rendered with parameters passed by the user using `rmarkdown::render(..., params = list(...))`.
+
+The intended way to use the templates in this package is slightly different.
+The idea is to use the function `make_materials()` to initially draft and optionally render Rmarkdown documents for the handout and phase 2 presentation, and to continue to work on those files independently of the package.
+
+**The package only offers initial drafting**.
+
+We use `knitr::knit_expand()` to inject parameters into the document and hard-code them.
+This makes the draft documents independent of the environment where `make_materials` was called.
+
+## Figures and tables
+
+The information handout is created in a directory called `./handout`, and creates `./handout/figures/` and `./handout/tables/` subdirectories.
+
+The presentation does not create any figures or tables.

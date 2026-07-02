@@ -30,10 +30,6 @@ make_materials <- function(
   workshop_name = "Pandemic Response Workshop",
   render = TRUE
 ) {
-  cli::cli_inform(
-    "Generating workshop materials at dir {.file {here::here()}}"
-  )
-
   # makes handout
   rmarkdown::draft(
     "handout",
