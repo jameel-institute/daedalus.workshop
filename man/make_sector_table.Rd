@@ -7,10 +7,11 @@
 make_sector_table(country)
 }
 \arguments{
-\item{country}{}
+\item{country}{A country name, or a type that can be coerced to a
+\verb{<daedalus_country}.}
 }
 \value{
-A \code{knitr::kable} table.
+A \code{knitr::kable()} table.
 }
 \description{
 Make table of sector GVA and contacts

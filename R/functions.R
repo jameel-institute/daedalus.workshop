@@ -5,28 +5,29 @@
 #' @return Nothing; called only for side-effects of drafting and rendering
 #' Rmarkdown documents for real-time pandemic response workshop materials.
 #'
-#' @param country description
+#' @param country The country name or three-letter ISO code.
 #'
-#' @param disease
+#' @param disease The disease name. Must be one of
+#' [daedalus.data::epidemic_names].
 #'
-#' @param r0
+#' @param t0 The current time-point. Defaults to 30 days.
 #'
-#' @param t0
+#' @param horizon The time horizon for projections. Defaults to 100 days.
 #'
-#' @param horizon
+#' @param n_samples The number of samples for parameter uncertainty. Default 10.
 #'
-#' @param n_samples
+#' @param workshop_name The workshop name. Intended to be used as a sub-title.
 #'
-#' @param render
+#' @param render Whether the drafted Rmarkdown document should be rendered.
 #'
 #' @export
 make_materials <- function(
   country = "GBR",
   disease = "sars_cov_1",
-  r0 = 3.0,
   t0 = 30,
   horizon = 100,
   n_samples = 10,
+  workshop_name = "Pandemic Response Workshop",
   render = TRUE
 ) {
   cli::cli_inform(
@@ -42,35 +43,63 @@ make_materials <- function(
     edit = FALSE
   )
 
+  handout_path <- file.path("handout", "handout.Rmd")
+
+  country_name <- daedalus::daedalus_country(country)$name
+
+  # makes drafted Rmd independent of params
+  writeLines(
+    knitr::knit_expand(
+      handout_path,
+      country = country_name,
+      disease = disease,
+      n_samples = n_samples,
+      t0 = t0,
+      horizon = horizon,
+      t_diff = horizon - t0,
+      workshop_name = workshop_name
+    ),
+    handout_path
+  )
+
+  # makes phase 2 presentation script only
+  pres_path <- file.path("pres_phase_02", "pres_phase_02.Rmd")
+
+  rmarkdown::draft(
+    "pres_phase_02",
+    "pres_phase_02",
+    "daedalus.workshop",
+    TRUE,
+    edit = FALSE
+  )
+
+  writeLines(
+    knitr::knit_expand(
+      pres_path,
+      country = country_name,
+      disease = disease,
+      n_samples = n_samples,
+      t0 = t0,
+      horizon = horizon + 100,
+      t_diff = horizon - t0,
+      workshop_name = workshop_name
+    ),
+    pres_path
+  )
+
   if (render) {
     rmarkdown::render(
-      file.path("handout", "handout.Rmd"),
+      handout_path,
       params = list(
-        country = country,
-        base_disease = disease,
         t0 = t0,
-        horizon = horizon,
-        n_samples = n_samples
+        horizon = horizon
       )
     )
+
+    rmarkdown::render(pres_path)
   }
-
-  # makes phase 1 presentation (may not be used)
-  # rmarkdown::draft(
-  #   "pres_phase_01", "pres_phase_01", "daedalus.workshop", TRUE
-  # )
-  # rmarkdown::render(
-  #   file.path("pres_phase_01", "pres_phase_01.Rmd"),
-  #   params = list(
-  #     country = country
-  #   )
-  # )
-
-  # # makes phase 2 presentation script only
-  # rmarkdown::draft(
-  #   "pres_phase_02", "pres_phase_02", "daedalus.workshop", TRUE
-  # )
 }
+
 
 #' Theme for handout figures
 #'
@@ -93,9 +122,10 @@ theme_eppi <- function() {
 
 #' Make table of sector GVA and contacts
 #'
-#' @param country
+#' @param country A country name, or a type that can be coerced to a
+#' `<daedalus_country`.
 #'
-#' @return A `knitr::kable` table.
+#' @return A `knitr::kable()` table.
 #'
 #' @export
 make_sector_table <- function(country) {
@@ -126,6 +156,12 @@ make_sector_table <- function(country) {
   knitr::kable(df, col.names = col_names)
 }
 
+#' Make hospital capacity breaches table
+#'
+#' @param tables_out Location to table outputs.
+#'
+#' @return A `knitr::kable()` table.
+#'
 #' @export
 make_hcap_breaches_table <- function(tables_out) {
   df <- get_table(FILE_HOSP_OVERFLOW_RISK, tables_out)
@@ -150,6 +186,12 @@ make_hcap_breaches_table <- function(tables_out) {
   knitr::kable(df, col.names = col_names)
 }
 
+#' Make deaths by age table
+#'
+#' @param tables_out Location to table outputs.
+#'
+#' @return A `knitr::kable()` table.
+#'
 #' @export
 make_deaths_by_age_table <- function(tables_out) {
   df <- get_table(FILE_DEATHS_BY_AGE, tables_out)
@@ -178,6 +220,12 @@ make_deaths_by_age_table <- function(tables_out) {
   knitr::kable(df, col.names = col_names)
 }
 
+#' Make domain costs table
+#'
+#' @param tables_out Location to table outputs.
+#'
+#' @return A `knitr::kable()` table.
+#'
 #' @export
 make_domain_costs_table <- function(tables_out) {
   df <- get_table(FILE_COST_BY_RESPONSE, tables_out)
@@ -211,6 +259,12 @@ make_domain_costs_table <- function(tables_out) {
   knitr::kable(df, col.names = col_names)
 }
 
+#' Make economic costs breakdown table
+#'
+#' @param tables_out Location to table outputs.
+#'
+#' @return A `knitr::kable()` table.
+#'
 #' @export
 make_econ_cost_table <- function(tables_out) {
   df <- get_table(FILE_ECON_COST_BREAKDOWN, tables_out)
@@ -243,6 +297,15 @@ make_econ_cost_table <- function(tables_out) {
   knitr::kable(df, col.names = col_names)
 }
 
+#' Add commas to numeric columns
+#'
+#' @param df A data.frame with columns matching `"pctl"`.
+#'
+#' @return A data.frame with columns matching `"pctl"` converted to type
+#' character and with commas added to make reading large numbers easier.
+#' Numbers are rounded to the nearest ones-place, or to the nearest 10th if
+#' less than 1.
+#'
 #' @export
 df_cols_with_commas <- function(df) {
   # assumes data frame has cols "pctl_50" etc

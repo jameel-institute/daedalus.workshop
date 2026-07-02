@@ -7,27 +7,28 @@
 make_materials(
   country = "GBR",
   disease = "sars_cov_1",
-  r0 = 3,
   t0 = 30,
   horizon = 100,
   n_samples = 10,
+  workshop_name = "Pandemic Response Workshop",
   render = TRUE
 )
 }
 \arguments{
-\item{country}{description}
+\item{country}{The country name or three-letter ISO code.}
 
-\item{disease}{}
+\item{disease}{The disease name. Must be one of
+\link[daedalus.data:epidemic_data]{daedalus.data::epidemic_names}.}
 
-\item{r0}{}
+\item{t0}{The current time-point. Defaults to 30 days.}
 
-\item{t0}{}
+\item{horizon}{The time horizon for projections. Defaults to 100 days.}
 
-\item{horizon}{}
+\item{n_samples}{The number of samples for parameter uncertainty. Default 10.}
 
-\item{n_samples}{}
+\item{workshop_name}{The workshop name. Intended to be used as a sub-title.}
 
-\item{render}{}
+\item{render}{Whether the drafted Rmarkdown document should be rendered.}
 }
 \value{
 Nothing; called only for side-effects of drafting and rendering
