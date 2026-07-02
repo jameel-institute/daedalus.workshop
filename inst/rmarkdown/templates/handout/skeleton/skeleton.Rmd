@@ -1,5 +1,6 @@
 ---
 title: "Information Handout"
+subtitle: "{{ workshop_name }}"
 author: Jameel Institute, Imperial College London
 date: "`r Sys.Date()`"
 output:
@@ -12,37 +13,6 @@ output:
     fig_caption: true
     extra_dependencies: ["tgtermes", "rotating", "booktabs"]
 link-citations: true
-params:
-  workshop_name:
-    label: "The workshop name."
-    value: "Pandemic Response Simulation Exercise"
-  date:
-    label: "Workshop date."
-    value: "2026-01-01"
-  country:
-    label: "The country affected by the hypothetical epidemic."
-    value: "United Kingdom"
-    choices: ["United Kingdom", "France", "Vietnam", "Singapore"]
-  base_disease:
-    label: "The baseline disease from which to draw epidemic parameters."
-    value: "influenza_2009"
-    choices: ["influenza_1918", "influenza_1957", "influenza_2009", "sars_cov_1", "sars_cov_2_pre_alpha", "sars_cov_2_delta", "sars_cov_2_omicron"]
-  r0:
-    label: "The initial basic reproduction number of the epidemic."
-    value: 1.5
-    input: numeric
-  t0:
-    label: "Current time in days since the first case."
-    value: 30
-    input: numeric
-  horizon:
-    label: "Time horizon in days since the first case."
-    value: 100
-    input: numeric
-  n_samples:
-    label: "Number of parameter samples."
-    value: 10
-    input: numeric
 ---
 
 ```{r settings, echo = FALSE}
@@ -84,16 +54,15 @@ if (!dir.exists(tables_out)) {
 ```
 
 ```{r params}
-country <- daedalus_country(params$country)
-country_name <- get_data(country, "name")
+country <- daedalus_country("{{ country }}")
 
-disease <- params$base_disease
+disease <- "{{ disease }}"
 infection <- daedalus_infection(disease) # to align with daedalus() arg names
 
-n_samples <- params$n_samples
+n_samples <- {{ n_samples }}
 
-t0 <- params$t0
-horizon <- params$horizon
+t0 <- {{ t0 }}
+horizon <- {{ horizon }}
 t_diff <- horizon - t0
 ```
 
@@ -102,17 +71,17 @@ t_diff <- horizon - t0
 
 # Explanation of the exercise
 
-You are a government advisor in **`r country_name`**.
-There is a global pandemic, and on day zero (see figure 1A) the first case is detected in `r country_name`.
+You are a government advisor in **{{ country }}**.
+There is a global pandemic, and on day zero (see figure 1A) the first case is detected in {{ country }}.
 
-On **day `r t0`**, every table needs to make a decision:
+On **day {{ t0 }}**, every table needs to make a decision:
 
 - Should we implement closures? 
 - Should we close businesses, while leaving schools open?
-- Or close both businesses and schools? Shall we implement this now, or on any day over the next **`r t_diff`** days?
+- Or close both businesses and schools? Shall we implement this now, or on any day over the next **{{ t_diff }}** days?
 - You can choose amongst several strategies, ranging in stringency (see table 1).
 
-The Imperial team presents you with projections of the health and economic outcomes of different strategies for the next `r t_diff` days.
+The Imperial team presents you with projections of the health and economic outcomes of different strategies for the next {{ t_diff }} days.
 They use Imperial’s DAEDALUS model for the projections.
 Before the coffee break, your table needs to commit to one strategy, and note it down on the response strategy form. 
 
@@ -121,7 +90,7 @@ There is considerable uncertainty surrounding the outcomes from each strategy (s
 After the coffee break, every table needs to briefly explain their chosen strategy.
 Our senior decision makers choose the strategy they want to implement.  
 
-On **Day `r horizon`**, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next 100 days.
+On **Day {{ horizon }}**, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next 100 days.
 The team also presents outcomes for one alternative strategy. 
 
 The workshop concludes with a discussion of the choices and the use of modelling in making tough trade-offs during early outbreaks.
@@ -166,8 +135,6 @@ Sickness absences and deaths of workers, teachers and students reduces economic 
 There is a circular loop, in that health, economic and education losses may instigate governments to implement or lift mitigation policies.
 See the online dashboard, [Daedalus Explore](https://daedalus.jameel-institute.org/scenarios/new).
 
-## Distribution of $R_0$
-
 ```{r plot-r0-dist}
 #| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
 #| shown below. Higher bars above values indicate that those values are more
@@ -177,8 +144,6 @@ knitr::include_graphics(
   file.path(figs_out, "plot_dist_r0.png")
 )
 ```
-
-## Distribution of hospitalisation rate
 
 ```{r plot-eta-dist}
 #| fig.cap: "Distribution of the mean hospitalisation rate. The true
@@ -202,16 +167,20 @@ We summarise newly detected cases by highlighting the median curve and shading t
 These are the 50% and 95% projection intervals. 
 
 ```{r explainer-raw}
-#| fig.cap: "WIP"
-#| 
+#| fig.cap: "Projected epidemic curves for each realised infection sample.
+#| There is uncertainty around the true infection parameters, and these curves
+#| show the range of possible outcomes given current information."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_cases_explainer.png")
 )
 ```
 
 ```{r explainer-shaded}
-#| fig.cap: "WIP"
-#| 
+#| fig.cap: "Epidemic projection curves are covered by shaded regions, which
+#| represent distance from the median curve. Curves farther away from the
+#| median curve represent less likely outcomes."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_cases.png")
 )
@@ -222,53 +191,69 @@ knitr::include_graphics(
 ## Projected epidemic outcomes for an unmitigated epidemic
 
 ```{r}
-#| fig.cap: "WIP"
-#|
+#| fig.cap: "Projections of daily new detected cases. Please consider that there
+#| may be under-ascertainment, i.e., not all cases may be detected and there
+#| may be more infections than detected cases."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_cases.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
-#| 
+#| fig.cap: "Projections of daily new hospital demand. Consider that there may
+#| be under-ascertainment, i.e., not all infections requiring hospital care may
+#| be detected. Hospital demand may be substantially greater
+#| than actual hospital capacity."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_hospitalisations.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
-#| 
+#| fig.cap: "Projections of total hospital demand. This may be interpreted as
+#| hospital occupancy. Consider that there may be under-ascertainment, i.e., not
+#| all infections requiring hospital care may be detected. Hospital demand may
+#| be substantially greater than actual hospital capacity."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_total_hosp.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
-#| 
+#| fig.cap: "Projections of daily deaths. Consider that there may be
+#| under-ascertaintment and not all deaths may be detected."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_daily_deaths.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projections of the cumulative numbers of detected cases and deaths
+#| by day {{ horizon }}. Shaded regions show the
+#| projection intervals."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_epi_summary.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projections of the cumulative numbers of deaths by day
+#| {{ horizon }} sub-divided by the age-group affected. Shaded regions show
+#| projection intervals."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_deaths_by_age.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Cumulative economic losses by day {{ horizon }}."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_unmit_gva_loss.png")
 )
@@ -277,49 +262,55 @@ knitr::include_graphics(
 ## Projected epidemic outcomes for mitigation scenarios
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected daily new detected cases."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_cases_square.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected daily new hospital demand (admissions)."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_hospitalisations_square.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected daily total hopsital demand (occupancy)."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_total_hosp_square.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected daily deaths."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_deaths_square.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected cumulative detected cases and deaths by day
+#| {{ horizon }}."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_epi_summary.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected cumulative detected deaths by day {{ horizon }} in each
+#| age group."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_deaths_by_age_square.png")
 )
 ```
 
 ```{r}
-#| fig.cap: "WIP"
+#| fig.cap: "Projected cumulative economic losses by day {{ horizon }}."
+
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_gva_loss_square.png")
 )

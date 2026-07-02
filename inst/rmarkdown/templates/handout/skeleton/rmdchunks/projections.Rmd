@@ -118,9 +118,9 @@ ggsave(
 ```
 
 ```{r timepoints}
-# taken from document params
-day_now <- params$t0
-horizon <- params$horizon
+# taken from injected params
+day_now <- t0
+horizon <- horizon
 ```
 
 ```{r response_levels}
