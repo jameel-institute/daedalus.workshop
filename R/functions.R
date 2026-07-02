@@ -92,11 +92,11 @@ theme_eppi <- function() {
 }
 
 #' Make table of sector GVA and contacts
-#' 
+#'
 #' @param country
-#' 
+#'
 #' @return A `knitr::kable` table.
-#' 
+#'
 #' @export
 make_sector_table <- function(country) {
   country <- daedalus::daedalus_country(country)
@@ -136,14 +136,15 @@ make_hcap_breaches_table <- function(tables_out) {
     response = dplyr::case_when(
       response == "none" ~ NAMES_PRECANNED_NPIS["unmitigated"],
       response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
-      response == "economic_closures" ~ 
+      response == "economic_closures" ~
         NAMES_PRECANNED_NPIS["business_closures"],
       response == "elimination" ~ NAMES_PRECANNED_NPIS["S+B closures"]
     )
   )
 
   col_names <- c(
-    "Mitigation response strategy", "Hospital capacity exceeded (%)"
+    "Mitigation response strategy",
+    "Hospital capacity exceeded (%)"
   )
 
   knitr::kable(df, col.names = col_names)
@@ -158,7 +159,7 @@ make_deaths_by_age_table <- function(tables_out) {
     response = dplyr::case_when(
       response == "unmitigated" ~ NAMES_PRECANNED_NPIS["unmitigated"],
       response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
-      response == "business_closures" ~ 
+      response == "business_closures" ~
         NAMES_PRECANNED_NPIS["business_closures"],
       response == "S+B closures" ~ NAMES_PRECANNED_NPIS["S+B closures"]
     )
@@ -186,7 +187,7 @@ make_domain_costs_table <- function(tables_out) {
     response = dplyr::case_when(
       response == "unmitigated" ~ NAMES_PRECANNED_NPIS["unmitigated"],
       response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
-      response == "business_closures" ~ 
+      response == "business_closures" ~
         NAMES_PRECANNED_NPIS["business_closures"],
       response == "S+B closures" ~ NAMES_PRECANNED_NPIS["S+B closures"]
     ),
@@ -219,7 +220,7 @@ make_econ_cost_table <- function(tables_out) {
     response = dplyr::case_when(
       response == "unmitigated" ~ NAMES_PRECANNED_NPIS["unmitigated"],
       response == "school_closures" ~ NAMES_PRECANNED_NPIS["school_closures"],
-      response == "business_closures" ~ 
+      response == "business_closures" ~
         NAMES_PRECANNED_NPIS["business_closures"],
       response == "S+B closures" ~ NAMES_PRECANNED_NPIS["S+B closures"]
     ),
