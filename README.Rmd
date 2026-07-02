@@ -55,7 +55,7 @@ _daedalus.workshop_ can be used with the main function, `make_materials()`, whic
 # code not run
 # supports some country parameters
 make_materials(
-  country = "GBR", disease = "influenza_2009", r0 = 3.0,
+  country = "GBR", disease = "influenza_2009",
   t0 = 30, horizon = 100,
   n_samples = 25
 )

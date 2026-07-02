@@ -7,12 +7,24 @@ Authors@R: c(
     person("Abdul Latif Jameel Institute for Disease and Emergency Analytics", role = "fnd"),
     person("Imperial College of Science, Technology and Medicine", role = c("cph", "fnd"))
   )
-Description: Automate the generation of pandemic response workshop materials
-    using the Daedalus family of packages.
+Description: Automate the generation of pandemic response workshop
+    materials using the Daedalus family of packages.
 License: MIT + file LICENSE
-Suggests: 
+Imports: 
+    daedalus,
+    daedalus.data,
+    dplyr,
+    ggplot2,
     knitr,
     rmarkdown,
+    scales,
+    tibble,
+    utils
+Suggests: 
+    bookdown,
+    kableExtra,
+    purrr,
+    revealjs,
     spelling,
     testthat (>= 3.0.0)
 VignetteBuilder: 
@@ -23,11 +35,3 @@ Encoding: UTF-8
 Language: en-GB
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Imports: 
-    bookdown,
-    cli,
-    ggplot2,
-    here,
-    kableExtra,
-    purrr,
-    revealjs

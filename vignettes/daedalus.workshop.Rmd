@@ -18,3 +18,11 @@ knitr::opts_chunk$set(
 library(daedalus.workshop)
 ```
 
+## Quick start
+
+Use the main function `make_materials()` to generate workshop materials.
+
+```r
+# set render=FALSE to prevent rendering
+make_materials("GBR", "sars_cov_1", render = FALSE)
+```

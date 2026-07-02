@@ -39,7 +39,7 @@ FILE_COST_BY_RESPONSE <- "table_cost_by_response.csv"
 #' @export
 FILE_ECON_COST_BREAKDOWN <- "table_econ_cost_breakdown.csv"
 
-#' @ name constants
+#' @name constants
 #'
 #' @keywords constants
 #'
@@ -51,10 +51,16 @@ NAMES_PRECANNED_NPIS <- c(
   `S+B closures` = "School and business closures (severe)"
 )
 
+#' Read a local CSV file
+#'
+#' @param file Filename.
+#'
+#' @param tables_out Directory.
+#'
 #' @export
-get_table <- function(x, tables_out) {
-  df <- read.csv(
-    file.path(tables_out, x)
+get_table <- function(file, tables_out) {
+  df <- utils::read.csv(
+    file.path(tables_out, file)
   )
 
   df

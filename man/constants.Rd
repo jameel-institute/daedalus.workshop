@@ -7,6 +7,7 @@
 \alias{FILE_DEATHS_BY_AGE}
 \alias{FILE_COST_BY_RESPONSE}
 \alias{FILE_ECON_COST_BREAKDOWN}
+\alias{NAMES_PRECANNED_NPIS}
 \title{Package constants}
 \format{
 An object of class \code{character} of length 1.
@@ -16,6 +17,8 @@ An object of class \code{character} of length 1.
 An object of class \code{character} of length 1.
 
 An object of class \code{character} of length 1.
+
+An object of class \code{character} of length 4.
 }
 \usage{
 FILE_HOSP_OVERFLOW_RISK
@@ -25,6 +28,8 @@ FILE_DEATHS_BY_AGE
 FILE_COST_BY_RESPONSE
 
 FILE_ECON_COST_BREAKDOWN
+
+NAMES_PRECANNED_NPIS
 }
 \description{
 Package constants
