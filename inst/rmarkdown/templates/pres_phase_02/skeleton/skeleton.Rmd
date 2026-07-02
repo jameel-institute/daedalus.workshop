@@ -6,41 +6,89 @@ output:
   revealjs::revealjs_presentation:
     transition: none
 link-citations: true
-params:
-  workshop_name:
-    label: "The workshop name."
-    value: "Pandemic Response Simulation Exercise"
-  date:
-    label: "Workshop date."
-    value: "2026-01-01"
-  country:
-    label: "The country affected by the hypothetical epidemic."
-    value: "United Kingdom"
-    choices: ["United Kingdom", "France", "Vietnam", "Singapore"]
 ---
 
 ```{r settings, echo = FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
-  fig.width = 9,
-  fig.height = 5,
-  dpi = 300,
+  dpi = 180,
   collapse = TRUE,
   message = FALSE,
   warning = FALSE,
-  out.width = "100%",
+  out.width = "70%",
   fig.showtext = TRUE
 )
-showtext::showtext_auto()
 ```
 
 ```{r setup}
 library(daedalus)
 library(daedalus.compare)
+library(daedalus.workshop)
+
 library(ggplot2)
 library(ggdist)
+
+library(dplyr)
+library(tidyr)
+library(purrr)
 ```
 
-# Page 1
+```{r setup-params}
+country <- daedalus_country("{{ country }}")
 
-# Page 2
+disease <- "{{ disease }}"
+infection <- daedalus_infection(disease) # to align with daedalus() arg names
+
+n_samples <- {{ n_samples }}
+
+t0 <- {{ t0 }}
+horizon <- {{ horizon }}
+t_diff <- horizon - t0
+```
+
+```{r inject-projections, child="rmdchunks/projections.Rmd", echo=FALSE}
+```
+
+# Days {{ t0 }} -- {{ horizon }}
+
+## Detected cases {.smaller}
+
+```{r plot_daily_infections}
+plots_epi_curves$daily_infections
+```
+
+## Daily new hospital demand {.smaller}
+
+```{r plot_daily_hosp}
+plots_epi_curves$daily_hospitalisations
+```
+
+## Total hospital demand {.smaller}
+
+```{r plot_total_hosp}
+plots_epi_curves$total_hosp
+```
+
+## Daily deaths
+
+```{r plot_daily_deaths}
+plots_epi_curves$daily_deaths
+```
+
+## Cumulative summary
+
+```{r plot_epi_summary}
+plot_epi_summary
+```
+
+## Deaths by age group
+
+```{r plot_deaths_age, fig.width=10}
+plot_deaths_by_age
+```
+
+## Economic losses {.smaller}
+
+```{r plot_econ_losses, fig.width=10}
+plot_econ_losses
+```
