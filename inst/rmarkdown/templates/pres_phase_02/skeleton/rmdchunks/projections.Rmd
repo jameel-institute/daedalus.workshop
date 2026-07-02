@@ -1,0 +1,495 @@
+
+```{r settings_internal, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+```
+
+```{r plot_labels}
+x_label_days <- "Days after first detected case"
+measure_levels <- c(
+  "daily_infections", "daily_hospitalisations",
+  "total_hosp", "daily_deaths"
+)
+```
+
+```{r r0_samples}
+# generate infection using H1N1 as a base
+# this is the least transmissible infection for which {daedalus} has data
+disease_x <- daedalus_infection(disease)
+r0 <- get_data(disease_x, "r0")
+r0_samples <- withr::with_seed(
+  1, rbeta(n_samples, 2, 5)
+) * r0 + 1.0
+r0_samples <- round(r0_samples, 4)
+r0_samples <- scales::rescale(r0_samples, c(1.0, 2))
+r0_samples <- sort(r0_samples)
+
+# R0 to use in phase 1 and 2
+r0_phase_1 <- median(r0_samples)
+r0_phase_2 <- quantile(r0_samples, 0.83)
+```
+
+```{r r0_summary}
+# get 95% confidence intervals around R0
+ci_95 <- ci(r0_samples)
+r0_summary <- c(
+  lower = median(r0_samples) - ci_95,
+  median = median(r0_samples),
+  upper = median(r0_samples) + ci_95
+)
+r0_summary <- round(r0_summary, 3)
+```
+
+```{r severity_profile}
+# draw mortality profile so working and school age worst affected
+severity_profile <- c(0.2, 1.5, 2, 0.2)
+
+# apply severity profile
+hfr <- get_data(disease_x, "hfr")
+hfr <- mean(hfr) * severity_profile * 10
+```
+
+```{r infection_samples}
+# make list of infection objects
+disease_list <- Map(
+  r0_samples,
+  f = function(x, y) {
+    daedalus_infection(
+      "influenza_2009",
+      r0 = x,
+      hfr = hfr
+    )
+  }
+)
+disease_tags <- glue::glue("sample_{seq_along(disease_list)}")
+```
+
+```{r plot_r0}
+plot_r0 <- ggplot() +
+  stat_histinterval(
+    aes(
+      r0_samples, fill = after_stat(level)
+    ),
+    limits = c(0.5, 1.0)
+  ) +
+    scale_fill_viridis_d(na.translate = FALSE) +
+    theme_bw() +
+    theme_eppi() +
+    theme(
+      axis.text = element_text(size = 18),
+      axis.title = element_text(size = 18)
+    ) +
+      labs(
+        x = "R0", y = "Density", fill = "Confidence interval"
+      )
+```
+
+```{r timepoints}
+# taken from injected params
+day_now <- t0
+horizon <- horizon
+```
+
+```{r inject-projections, child="response.Rmd", echo=FALSE}
+```
+
+```{r hosp_cap}
+# used to draw thresholds on projection figures
+hcap <- get_data(country, "hospital_capacity")
+```
+
+```{r}
+# prepare outcomes for two scenarios
+output <- run_scenarios(
+  country,
+  disease_list,
+  response_strategy = list(
+    none = response_none,
+    main = response_main
+  ),
+  time_end = horizon
+)
+```
+
+```{r}
+death_reporting <- 0.9
+case_reporting <- 0.33
+hosp_reporting <- 0.9
+
+response_levels <- c("none", "main", "alt")
+```
+
+```{r}
+#### GET ALL OUTPUTS ####
+# get epi curve data and prepare for plotting
+data_epi_curve <- get_epicurve_data(output, disease_tags, format = "long")
+
+# get reported values
+data_epi_curve <- mutate(
+  data_epi_curve,
+  reporting_rate = case_when(
+    measure == "daily_deaths" ~ death_reporting,
+    measure == "daily_infections" ~ case_reporting,
+    measure == "daily_hospitalisations" ~ hosp_reporting,
+    measure == "total_hosp" ~ hosp_reporting
+  ),
+  reported_value = value * reporting_rate,
+  response = forcats::as_factor(
+    response
+  )
+)
+
+data_epi_curve_summary <- group_by(
+  data_epi_curve, time, response, measure
+) %>%
+  curve_interval(
+    value, reported_value,
+    .width = c(0.5, 0.95)
+  )
+```
+
+```{r}
+# get epi summary data
+data_epi_summary <- get_summary_data(output, disease_tags, format = "long")
+
+# get reported values1
+data_epi_summary <- mutate(
+  data_epi_summary,
+  reporting_rate = case_when(
+    measure == "total_deaths" ~ death_reporting,
+    measure == "epidemic_size" ~ case_reporting,
+    measure == "total_hospitalisations" ~ hosp_reporting
+  ),
+  reported_value = value * reporting_rate,
+  response = forcats::as_factor(
+    response
+  )
+)
+```
+
+```{r}
+data_deaths <- get_summary_data(
+  output, disease_tags,
+  format = "long", measures = "deaths", groups = "age_group"
+)
+
+data_deaths <- mutate(
+  data_deaths,
+  reported_value = value * death_reporting,
+  response = forcats::as_factor(
+    response
+  )
+)
+```
+
+```{r}
+# get losses data
+data_cost_output <- get_cost_data(output, disease_tags, format = "long") %>%
+  filter(domain != "life_years") %>%
+  mutate(
+    response = forcats::as_factor(
+      response
+    )
+  )
+
+# separate economic losses into closures and absences
+data_econ_costs <- get_econ_cost_data(output)
+data_econ_cost_closures <- filter(
+  data_econ_costs, cost_type == "economic_cost_closures"
+) %>%
+  mutate(
+    response = forcats::as_factor(
+      response
+    )
+  ) %>%
+  group_by(response) %>%
+  summarise(cost = median(cost))
+
+data_econ_cost_absences <- filter(
+  data_econ_costs, cost_type == "economic_cost_absences"
+) %>%
+  mutate(
+    response = forcats::as_factor(
+      response
+    )
+  )
+```
+
+```{r}
+# set current day
+day_zero <- 30
+day_now <- 200
+```
+
+```{r}
+# FIGURES: epi curves
+measures <- c(
+  "daily_infections", "daily_hospitalisations",
+  "total_hosp", "daily_deaths"
+)
+
+curve_measure_labels <- c(
+  daily_infections = "New detected cases",
+  daily_hospitalisations = "New hospital demand",
+  total_hosp = "Total hospital demand",
+  daily_deaths = "New deaths"
+)
+
+response_labels <- c(
+  none = "Unmitigated",
+  main = "Chosen response",
+  alt = "Alternative response"
+)
+
+plots_epi_curves <- Map(
+  measures, curve_measure_labels,
+  f = function(m, l) {
+    plot_epi_curves <-
+      ggplot() +
+      # red area for response active
+      annotate(
+        geom = "rect",
+        xmin = response_start, xmax = response_start + response_duration,
+        ymin = 0, ymax = Inf,
+        fill = "steelblue", alpha = 0.2
+      ) +
+      geom_line(
+        data = data_epi_curve %>%
+          filter(measure == m),
+        aes(time, reported_value, group = tag),
+        alpha = 0.8, linewidth = 0.2
+      ) +
+      geom_lineribbon(
+        data = data_epi_curve_summary %>%
+          filter(measure == m),
+        aes(time, reported_value,
+          ymin = reported_value.lower, ymax = reported_value.upper
+        ),
+        col = "black",
+        alpha = 0.8
+      ) +
+      facet_grid(
+        cols = vars(response),
+        labeller = labeller(
+          response = response_labels
+        )
+      ) +
+      geom_vline(
+        xintercept = day_now,
+        col = "red", linetype = "dashed"
+      ) +
+      scale_fill_viridis_d(
+        begin = 0.1, direction = -1,
+        labels = function(x) {
+          scales::percent(as.numeric(x))
+        }
+      ) +
+      scale_y_continuous(
+        labels = scales::comma
+      ) +
+      xlim(day_zero, horizon) +
+      labs(
+        x = x_label_days,
+        y = l,
+        fill = "Proj. interv."
+      ) +
+      theme_bw(base_size = 24, base_family = "Arial") +
+      theme_eppi()
+
+    if (m == "total_hosp") {
+      plot_epi_curves <- plot_epi_curves +
+        geom_hline(
+          yintercept = hcap,
+          col = "red", linetype = "dashed"
+        )
+    }
+
+    plot_epi_curves
+  }
+)
+```
+
+<!-- ## Cumulative summary -->
+
+```{r}
+summary_measure_labels <- c(
+  epidemic_size = "Cumulative detected cases",
+  total_deaths = "Cumulative deaths"
+)
+```
+
+```{r}
+plot_epi_summary <- ggplot(
+  data_epi_summary %>%
+    filter(measure != "total_hospitalisations")
+) +
+  stat_interval(
+    aes(
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(y = reported_value),
+    .width = c(0.5, 0.95)
+  ) +
+  facet_grid(
+    cols = vars(response),
+    rows = vars(measure),
+    labeller = labeller(
+      measure = summary_measure_labels,
+      response = response_labels
+    ),
+    scales = "free"
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = NULL,
+    y = "Count",
+    colour = "Proj. interv."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_eppi() +
+  theme(axis.text.x = element_blank())
+```
+
+<!-- ## Deaths by age group -->
+
+```{r}
+plot_deaths_by_age <- ggplot(data_deaths) +
+  stat_interval(
+    aes(
+      forcats::fct_relevel(
+        age_group,
+        c("0-4", "5-19", "20-64", "65+")
+      ),
+      y = reported_value,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(age_group, y = reported_value),
+    .width = c(0.5, 0.95),
+  ) +
+  facet_grid(
+    cols = vars(response),
+    # rows = vars(measure),
+    labeller = labeller(
+      measure = summary_measure_labels,
+      response = response_labels
+    ),
+    scales = "free"
+  ) +
+  scale_y_continuous(
+    labels = scales::comma
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    y = "Cumulative deaths",
+    x = "Age group",
+    colour = "Proj. interv."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(
+    base_size = 24, base_family = "Arial"
+  ) +
+  theme_eppi()
+```
+
+<!-- ## Economic losses {.smaller} -->
+
+```{r}
+loss_measure_labels <- c(
+  economic = "GVA", 
+  education = "Future earnings",
+  life_value = "Life years"
+)
+```
+
+```{r}
+plot_econ_losses <- ggplot(data_cost_output) +
+  stat_interval(
+    aes(
+      x = response, y = cost,
+      color = after_stat(
+        level
+      )
+    ),
+    .width = c(0.5, 0.95),
+    linewidth = 30, alpha = 0.8,
+    normalize = "groups"
+  ) +
+  stat_pointinterval(
+    aes(response, cost),
+    .width = c(0.5, 0.95),
+  ) +
+  facet_wrap(
+    facets = vars(domain),
+    # rows = vars(measure),
+    labeller = labeller(
+      # measure = summary_measure_labels,
+      domain = loss_measure_labels
+    ),
+    scales = "free"
+  ) +
+  scale_x_discrete(
+    labels = response_labels,
+    guide = guide_axis(n.dodge = 2)
+  ) +
+  scale_y_continuous(
+    labels = scales::label_currency(
+      scale = 0.7e-3, prefix = "£", suffix = " B"
+    )
+  ) +
+  scale_colour_viridis_d(
+    begin = 0.1, direction = -1,
+    labels = function(x) {
+      scales::percent(as.numeric(x))
+    }
+  ) +
+  labs(
+    x = NULL,
+    y = "Cumulative value lost (billion £)",
+    col = "Proj. interv."
+  ) +
+  guides(
+    colour = guide_legend(
+      override.aes = list(linewidth = 3)
+    )
+  ) +
+  theme_bw(24, "Arial") +
+  theme_eppi()
+```
