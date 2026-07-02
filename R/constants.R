@@ -1,48 +1,48 @@
 #' Package constants
-#' 
+#'
 #' @name constants
 #' @rdname constants
-#' 
+#'
 #' @keywords constants
-#' 
+#'
 #' @examples
-#' 
+#'
 #' FILE_HOSP_OVERFLOW_RISK
-#' 
+#'
 #' FILE_DEATHS_BY_AGE
-#' 
+#'
 #' FILE_COST_BY_RESPONSE
-#' 
+#'
 #' FILE_ECON_COST_BREAKDOWN
-#' 
+#'
 #' @export
 FILE_HOSP_OVERFLOW_RISK <- "table_hcap_breaches.csv"
 
 #' @name constants
-#' 
+#'
 #' @keywords constants
-#' 
+#'
 #' @export
 FILE_DEATHS_BY_AGE <- "table_deaths_by_age.csv"
 
 #' @name constants
-#' 
+#'
 #' @keywords constants
-#' 
+#'
 #' @export
 FILE_COST_BY_RESPONSE <- "table_cost_by_response.csv"
 
 #' @name constants
-#' 
+#'
 #' @keywords constants
-#' 
+#'
 #' @export
 FILE_ECON_COST_BREAKDOWN <- "table_econ_cost_breakdown.csv"
 
-#'@ name constants
-#' 
+#' @ name constants
+#'
 #' @keywords constants
-#' 
+#'
 #' @export
 NAMES_PRECANNED_NPIS <- c(
   unmitigated = "No closures (unmitigated)",
