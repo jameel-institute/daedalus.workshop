@@ -5,17 +5,14 @@
 library(daedalus.workshop)
 ```
 
-This is a special vignette, which shares the same name as the package.
-It will render as the “Get started” page in the navigation bar of
-*pkgdown* websites.
+## Quick start
 
-To develop it further:
+Use the main function
+[`make_materials()`](../reference/make_materials.md) to generate
+workshop materials.
 
-1.  Rename the file to your package name;
+``` r
 
-2.  Add code and explainers to help users get started with using your
-    package in this vignette;
-
-3.  Remember to add and link references if needed.
-
-## References
+# set render=FALSE to prevent rendering
+make_materials("GBR", "sars_cov_1", render = FALSE)
+```

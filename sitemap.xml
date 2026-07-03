@@ -1,14 +1,25 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
+<url><loc>/CLAUDE.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
 <url><loc>/LICENSE.html</loc></url>
 <url><loc>/articles/daedalus.workshop.html</loc></url>
+<url><loc>/articles/design_decisions.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
+<url><loc>/reference/constants.html</loc></url>
 <url><loc>/reference/daedalus.workshop-package.html</loc></url>
-<url><loc>/reference/get_manual_mean.html</loc></url>
+<url><loc>/reference/df_cols_with_commas.html</loc></url>
+<url><loc>/reference/get_table.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/make_deaths_by_age_table.html</loc></url>
+<url><loc>/reference/make_domain_costs_table.html</loc></url>
+<url><loc>/reference/make_econ_cost_table.html</loc></url>
+<url><loc>/reference/make_hcap_breaches_table.html</loc></url>
+<url><loc>/reference/make_materials.html</loc></url>
+<url><loc>/reference/make_sector_table.html</loc></url>
+<url><loc>/reference/theme_eppi.html</loc></url>
 </urlset>
 
