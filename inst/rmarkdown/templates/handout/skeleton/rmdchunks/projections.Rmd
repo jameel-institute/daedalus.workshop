@@ -71,7 +71,7 @@ plot_r0 <- ggplot() +
     aes(
       r0_samples, fill = after_stat(level)
     ),
-    limits = c(0.5, 1.0)
+    .width = c(0.5, 1.0)
   ) +
     scale_fill_viridis_d(na.translate = FALSE) +
     theme_bw() +
@@ -97,7 +97,7 @@ plot_eta <- ggplot() +
     aes(
       eta_means, fill = after_stat(level)
     ),
-    limits = c(0.5, 1.0)
+    .width = c(0.5, 1.0)
   ) +
     scale_x_continuous(labels = scales::percent) +
     scale_fill_viridis_d(na.translate = FALSE) +

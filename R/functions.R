@@ -84,14 +84,7 @@ make_materials <- function(
   )
 
   if (render) {
-    rmarkdown::render(
-      handout_path,
-      params = list(
-        t0 = t0,
-        horizon = horizon
-      )
-    )
-
+    rmarkdown::render(handout_path)
     rmarkdown::render(pres_path)
   }
 }
@@ -119,7 +112,7 @@ theme_eppi <- function() {
 #' Make table of sector GVA and contacts
 #'
 #' @param country A country name, or a type that can be coerced to a
-#' `<daedalus_country`.
+#' `<daedalus_country>`.
 #'
 #' @return A `knitr::kable()` table.
 #'
@@ -238,7 +231,7 @@ make_domain_costs_table <- function(tables_out) {
     domain = dplyr::case_when(
       domain == "economic" ~ "Economic",
       domain == "education" ~ "Education",
-      domain == "lfie_value" ~ "Life years"
+      domain == "life_value" ~ "Life years"
     )
   )
 

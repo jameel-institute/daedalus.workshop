@@ -217,12 +217,6 @@ data_econ_cost_absences <- filter(
 ```
 
 ```{r}
-# set current day
-day_zero <- 30
-day_now <- 200
-```
-
-```{r}
 # FIGURES: epi curves
 measures <- c(
   "daily_infections", "daily_hospitalisations",
@@ -288,7 +282,7 @@ plots_epi_curves <- Map(
       scale_y_continuous(
         labels = scales::comma
       ) +
-      xlim(day_zero, horizon) +
+      xlim(day_now, horizon) +
       labs(
         x = x_label_days,
         y = l,
