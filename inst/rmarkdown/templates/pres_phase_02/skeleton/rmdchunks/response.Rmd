@@ -4,6 +4,7 @@
 # simulate business and school closures but with schools open
 # NOTE: THIS IS AN EXAMPLE, MODIFY THIS CODE TO RUN RESULTS
 openness_coef <- daedalus.data::closure_strategy_data$elimination
+n_sectors <- length(openness_coef)
 i_EDUCATION_SECTOR <- 41L
 openness_coef[i_EDUCATION_SECTOR] <- 1.0
 ```
@@ -16,7 +17,7 @@ response_duration <- 90 # this should be fixed for Step 3
 # first do a null response
 response_none <- daedalus_timed_npi(
  response_start, response_start + response_duration,
- list(rep(1.0, 45L)), country 
+ list(rep(1.0, n_sectors)), country 
 )
 
 # make response option

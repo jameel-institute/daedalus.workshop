@@ -276,7 +276,7 @@ knitr::include_graphics(
 ```
 
 ```{r}
-#| fig.cap: "Projected daily total hopsital demand (occupancy)."
+#| fig.cap: "Projected daily total hospital demand (occupancy)."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_total_hosp_square.png")
 )
@@ -341,7 +341,7 @@ make_deaths_by_age_table(tables_out)
 ### Domain-specific costs (millions USD)
 
 ```{r domain_specific_costs}
-make_deaths_by_age_table(tables_out)
+make_domain_costs_table(tables_out)
 ```
 
 ### Economic costs due to closures and absences (millions USD)
