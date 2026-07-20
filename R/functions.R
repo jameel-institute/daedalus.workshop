@@ -18,6 +18,8 @@
 #'
 #' @param workshop_name The workshop name. Intended to be used as a sub-title.
 #'
+#' @param date The workshop date as a string. Defaults to the current date.
+#'
 #' @param render Whether the drafted Rmarkdown document should be rendered.
 #'
 #' @export
@@ -28,6 +30,7 @@ make_materials <- function(
   horizon = 100,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
+  date = Sys.Date(),
   render = TRUE
 ) {
   # makes handout
@@ -39,54 +42,76 @@ make_materials <- function(
     edit = FALSE
   )
 
-  handout_path <- file.path("handout", "handout.Rmd")
+  handout_dir <- "handout"
+  pres_dir <- "pres_phase_02"
+
+  handout_path <- file.path(handout_dir, "handout.Rmd")
+  pres_path <- file.path(pres_dir, "pres_phase_02.Rmd")
 
   country_name <- daedalus::daedalus_country(country)$name
+  disease_name <- daedalus::daedalus_infection(disease)$name
 
-  # makes drafted Rmd independent of params
-  writeLines(
-    knitr::knit_expand(
-      handout_path,
-      country = country_name,
-      disease = disease,
-      n_samples = n_samples,
-      t0 = t0,
-      horizon = horizon,
-      t_diff = horizon - t0,
-      workshop_name = workshop_name
-    ),
-    handout_path
+  checkmate::assert_number(t0, lower = 0, finite = TRUE)
+  checkmate::assert_number(horizon, lower = 10, finite = TRUE)
+  checkmate::assert_number(n_samples, lower = 10, finite = TRUE)
+  checkmate::assert_string(workshop_name)
+
+  tryCatch(
+    {
+      # makes drafted Rmd independent of params
+      writeLines(
+        knitr::knit_expand(
+          handout_path,
+          country = country_name,
+          disease = disease,
+          n_samples = n_samples,
+          t0 = t0,
+          horizon = horizon,
+          t_diff = horizon - t0,
+          workshop_name = workshop_name
+        ),
+        handout_path
+      )
+
+      rmarkdown::draft(
+        "pres_phase_02",
+        "pres_phase_02",
+        "daedalus.workshop",
+        TRUE,
+        edit = FALSE
+      )
+
+      writeLines(
+        knitr::knit_expand(
+          pres_path,
+          country = country_name,
+          disease = disease,
+          n_samples = n_samples,
+          t0 = t0,
+          horizon = horizon + 100,
+          t_diff = horizon - t0,
+          workshop_name = workshop_name
+        ),
+        pres_path
+      )
+
+      if (render) {
+        rmarkdown::render(handout_path)
+        rmarkdown::render(pres_path)
+      }
+    },
+    error = function(e) {
+      # clean up dirs
+      fs::dir_delete(handout_dir)
+      fs::dir_delete(pres_dir)
+
+      cli::cli_abort(
+        "`make_materials()` errored with the following error, quitting while \
+        removing output directories and contents:
+        {e}"
+      )
+    }
   )
-
-  # makes phase 2 presentation script only
-  pres_path <- file.path("pres_phase_02", "pres_phase_02.Rmd")
-
-  rmarkdown::draft(
-    "pres_phase_02",
-    "pres_phase_02",
-    "daedalus.workshop",
-    TRUE,
-    edit = FALSE
-  )
-
-  writeLines(
-    knitr::knit_expand(
-      pres_path,
-      country = country_name,
-      disease = disease,
-      n_samples = n_samples,
-      t0 = t0,
-      horizon = horizon + 100,
-      t_diff = horizon - t0,
-      workshop_name = workshop_name
-    ),
-    pres_path
-  )
-
-  if (render) {
-    rmarkdown::render(handout_path)
-    rmarkdown::render(pres_path)
-  }
 }
 
 
