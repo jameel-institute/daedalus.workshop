@@ -11,6 +11,7 @@ make_materials(
   horizon = 100,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
+  date = Sys.Date(),
   render = TRUE
 )
 }
@@ -18,7 +19,7 @@ make_materials(
 \item{country}{The country name or three-letter ISO code.}
 
 \item{disease}{The disease name. Must be one of
-\link[daedalus.data:epidemic_data]{daedalus.data::epidemic_names}.}
+\link[daedalus.data:epidemic_names]{daedalus.data::epidemic_names}.}
 
 \item{t0}{The current time-point. Defaults to 30 days.}
 
@@ -27,6 +28,8 @@ make_materials(
 \item{n_samples}{The number of samples for parameter uncertainty. Default 10.}
 
 \item{workshop_name}{The workshop name. Intended to be used as a sub-title.}
+
+\item{date}{The workshop date as a string. Defaults to the current date.}
 
 \item{render}{Whether the drafted Rmarkdown document should be rendered.}
 }

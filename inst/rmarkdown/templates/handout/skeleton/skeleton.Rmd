@@ -2,13 +2,13 @@
 title: "Information Handout"
 subtitle: "{{ workshop_name }}"
 author: Jameel Institute, Imperial College London
-date: "`r Sys.Date()`"
+date: "{{ date }}"
+documentclass: "scrreprt"
+geometry: "left=2cm, right=2cm, top=1.5cm, bottom=1.5cm"
 output:
-  bookdown::pdf_document2:
-    documentclass: scrbook
+  bookdown::pdf_book:
     toc-depth: 2
     secnumdepth: 2
-    geometry: "left=5cm, right=5cm, top=2.5cm, bottom=2.5cm"
     number_sections: true
     fig_caption: true
     extra_dependencies: ["tgtermes", "rotating", "booktabs"]
