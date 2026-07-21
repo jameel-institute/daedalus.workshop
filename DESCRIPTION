@@ -1,6 +1,6 @@
 Package: daedalus.workshop
 Title: Generate Pandemic Response Workshop Materials Using Daedalus
-Version: 0.0.0.9000
+Version: 0.0.2
 Authors@R: c(
     person("Pratik", "Gupte", , "pratik.gupte@lshtm.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-5294-7819")),
@@ -11,10 +11,14 @@ Description: Automate the generation of pandemic response workshop
     materials using the Daedalus family of packages.
 License: MIT + file LICENSE
 Imports: 
+    checkmate,
+    cli,
     daedalus,
     daedalus.data,
     dplyr,
+    fs,
     ggplot2,
+    glue,
     knitr,
     rmarkdown,
     scales,

@@ -4,14 +4,20 @@ subtitle: "{{ workshop_name }}"
 author: Jameel Institute, Imperial College London
 date: "{{ date }}"
 documentclass: "scrreprt"
-geometry: "left=2cm, right=2cm, top=1.5cm, bottom=1.5cm"
+geometry: "left=2cm, right=2cm, top=1.5cm, bottom=2cm"
+fontfamily: "tgtermes"
+header-includes:
+  - \addtokomafont{disposition}{\rmfamily}
+  - \pagenumbering{arabic}
 output:
   bookdown::pdf_book:
     toc-depth: 2
     secnumdepth: 2
     number_sections: true
     fig_caption: true
-    extra_dependencies: ["tgtermes", "rotating", "booktabs"]
+    papersize: a4
+    fontsize: 12pt
+    extra_dependencies: ["rotating", "booktabs"]
 link-citations: true
 ---
 
@@ -321,7 +327,7 @@ knitr::include_graphics(
 ## GVA and contacts for each economic sector
 
 ```{r sector_gva_contacts}
-make_sector_table(country)
+make_sector_table(country, "{{ currency }}")
 ```
 
 ## Risk of exceeding hospital capacity
@@ -341,11 +347,11 @@ make_deaths_by_age_table(tables_out)
 ### Domain-specific costs (millions USD)
 
 ```{r domain_specific_costs}
-make_domain_costs_table(tables_out)
+make_domain_costs_table(tables_out, "{{ currency }}")
 ```
 
 ### Economic costs due to closures and absences (millions USD)
 
 ```{r econ_costs_breakdown}
-make_econ_cost_table(tables_out)
+make_econ_cost_table(tables_out, "{{ currency }}")
 ```
