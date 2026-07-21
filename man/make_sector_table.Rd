@@ -4,11 +4,14 @@
 \alias{make_sector_table}
 \title{Make table of sector GVA and contacts}
 \usage{
-make_sector_table(country)
+make_sector_table(country, currency = "$")
 }
 \arguments{
 \item{country}{A country name, or a type that can be coerced to a
 \verb{<daedalus_country>}.}
+
+\item{currency}{A string for the currency or currency symbol to include in
+the column header. Default to the US dollar symbol "$".}
 }
 \value{
 A \code{knitr::kable()} table.

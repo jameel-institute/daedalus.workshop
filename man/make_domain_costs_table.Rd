@@ -4,10 +4,13 @@
 \alias{make_domain_costs_table}
 \title{Make domain costs table}
 \usage{
-make_domain_costs_table(tables_out)
+make_domain_costs_table(tables_out, currency = "$")
 }
 \arguments{
 \item{tables_out}{Location to table outputs.}
+
+\item{currency}{A string for the currency or currency symbol to include in
+the column header. Default to the US dollar symbol "$".}
 }
 \value{
 A \code{knitr::kable()} table.

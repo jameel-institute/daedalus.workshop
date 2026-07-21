@@ -4,10 +4,13 @@
 \alias{make_econ_cost_table}
 \title{Make economic costs breakdown table}
 \usage{
-make_econ_cost_table(tables_out)
+make_econ_cost_table(tables_out, currency = "$")
 }
 \arguments{
 \item{tables_out}{Location to table outputs.}
+
+\item{currency}{A string for the currency or currency symbol to include in
+the column header. Default to the US dollar symbol "$".}
 }
 \value{
 A \code{knitr::kable()} table.

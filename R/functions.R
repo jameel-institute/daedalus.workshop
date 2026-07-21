@@ -19,6 +19,10 @@
 #' @param workshop_name The workshop name. Intended to be used as a sub-title.
 #'
 #' @param date The workshop date as a string. Defaults to the current date.
+#' 
+#' @param currency A string for the currency name or symbol to be used. A symbol
+#' is preferred as the final use is in the form `"<symbol>M"` to indicate
+#' millions in `currency`.
 #'
 #' @param render Whether the drafted Rmarkdown document should be rendered.
 #'
@@ -30,7 +34,8 @@ make_materials <- function(
   horizon = 100,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
-  date = Sys.Date(),
+  date = as.character(Sys.Date()),
+  currency = "$",
   render = TRUE
 ) {
   # makes handout
@@ -55,6 +60,7 @@ make_materials <- function(
   checkmate::assert_number(horizon, lower = 10, finite = TRUE)
   checkmate::assert_number(n_samples, lower = 10, finite = TRUE)
   checkmate::assert_string(workshop_name)
+  checkmate::assert_string(date)
 
   tryCatch(
     {
@@ -68,7 +74,8 @@ make_materials <- function(
           t0 = t0,
           horizon = horizon,
           t_diff = horizon - t0,
-          workshop_name = workshop_name
+          workshop_name = workshop_name,
+          currency = currency
         ),
         handout_path
       )
@@ -85,7 +92,7 @@ make_materials <- function(
         knitr::knit_expand(
           pres_path,
           country = country_name,
-          disease = disease,
+          disease = disease_name,
           n_samples = n_samples,
           t0 = t0,
           horizon = horizon + 100,
@@ -139,10 +146,13 @@ theme_eppi <- function() {
 #' @param country A country name, or a type that can be coerced to a
 #' `<daedalus_country>`.
 #'
+#' @param currency A string for the currency or currency symbol to include in
+#' the column header. Default to the US dollar symbol "$".
+#'
 #' @return A `knitr::kable()` table.
 #'
 #' @export
-make_sector_table <- function(country) {
+make_sector_table <- function(country, currency = "$") {
   country <- daedalus::daedalus_country(country)
 
   gva <- daedalus::get_data(country, "gva")
@@ -163,11 +173,15 @@ make_sector_table <- function(country) {
 
   col_names <- c(
     "Economic sector",
-    "Daily GVA ($M)",
+    glue::glue("Daily GVA ({currency}M)"),
     "Workplace contacts"
   )
 
-  knitr::kable(df, col.names = col_names)
+  kableExtra::row_spec(
+    knitr::kable(df, col.names = col_names, align = c("l", "r", "r")),
+    0,
+    bold = TRUE
+  )
 }
 
 #' Make hospital capacity breaches table
@@ -197,7 +211,11 @@ make_hcap_breaches_table <- function(tables_out) {
     "Hospital capacity exceeded (%)"
   )
 
-  knitr::kable(df, col.names = col_names)
+  kableExtra::row_spec(
+    knitr::kable(df, col.names = col_names),
+    0,
+    bold = TRUE
+  )
 }
 
 #' Make deaths by age table
@@ -226,22 +244,37 @@ make_deaths_by_age_table <- function(tables_out) {
   col_names <- c(
     "Mitigation response strategy",
     "Age group",
-    "Median (50th percentile)",
+    "Median",
     "25th percentile",
     "75th percentile"
   )
 
-  knitr::kable(df, col.names = col_names)
+  kableExtra::row_spec(
+    kableExtra::column_spec(
+      knitr::kable(
+        df,
+        col.names = col_names,
+        align = c("l", "l", "r", "r", "r")
+      ),
+      1,
+      width = "10em"
+    ),
+    0,
+    bold = TRUE
+  )
 }
 
 #' Make domain costs table
 #'
 #' @param tables_out Location to table outputs.
 #'
+#' @param currency A string for the currency or currency symbol to include in
+#' the column header. Default to the US dollar symbol "$".
+#'
 #' @return A `knitr::kable()` table.
 #'
 #' @export
-make_domain_costs_table <- function(tables_out) {
+make_domain_costs_table <- function(tables_out, currency = "$") {
   df <- get_table(FILE_COST_BY_RESPONSE, tables_out)
 
   df <- dplyr::mutate(
@@ -265,22 +298,37 @@ make_domain_costs_table <- function(tables_out) {
   col_names <- c(
     "Mitigation response strategy",
     "Cost domain",
-    "Median (50th percentile)",
-    "25th percentile",
-    "75th percentile"
+    glue::glue("Median ({currency}M)"),
+    glue::glue("25th percentile ({currency}M)"),
+    glue::glue("75th percentile ({currency}M)")
   )
 
-  knitr::kable(df, col.names = col_names)
+  kableExtra::row_spec(
+    kableExtra::column_spec(
+      knitr::kable(
+        df,
+        col.names = col_names,
+        align = c("l", "l", "r", "r", "r")
+      ),
+      1,
+      width = "10em"
+    ),
+    0,
+    bold = TRUE
+  )
 }
 
 #' Make economic costs breakdown table
 #'
 #' @param tables_out Location to table outputs.
 #'
+#' @param currency A string for the currency or currency symbol to include in
+#' the column header. Default to the US dollar symbol "$".
+#'
 #' @return A `knitr::kable()` table.
 #'
 #' @export
-make_econ_cost_table <- function(tables_out) {
+make_econ_cost_table <- function(tables_out, currency = "$") {
   df <- get_table(FILE_ECON_COST_BREAKDOWN, tables_out)
 
   df <- dplyr::mutate(
@@ -303,12 +351,23 @@ make_econ_cost_table <- function(tables_out) {
   col_names <- c(
     "Mitigation response strategy",
     "Cost type",
-    "Median (50th percentile)",
-    "25th percentile",
-    "75th percentile"
+    glue::glue("Median ({currency}M)"),
+    glue::glue("25th percentile ({currency}M)"),
+    glue::glue("75th percentile ({currency}M)")
   )
-
-  knitr::kable(df, col.names = col_names)
+  kableExtra::row_spec(
+    kableExtra::column_spec(
+      knitr::kable(
+        df,
+        col.names = col_names,
+        align = c("l", "l", "r", "r", "r")
+      ),
+      1,
+      width = "10em"
+    ),
+    0,
+    bold = TRUE
+  )
 }
 
 #' Add commas to numeric columns
