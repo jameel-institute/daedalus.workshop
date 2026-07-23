@@ -57,10 +57,11 @@ make_materials <- function(
   disease_name <- daedalus::daedalus_infection(disease)$name
 
   checkmate::assert_number(t0, lower = 0, finite = TRUE)
-  checkmate::assert_number(horizon, lower = 10, finite = TRUE)
+  checkmate::assert_number(horizon, lower = t0, finite = TRUE)
   checkmate::assert_number(n_samples, lower = 10, finite = TRUE)
   checkmate::assert_string(workshop_name)
   checkmate::assert_string(date)
+  checkmate::assert_string(currency)
 
   tryCatch(
     {
@@ -109,8 +110,8 @@ make_materials <- function(
     },
     error = function(e) {
       # clean up dirs
-      fs::dir_delete(handout_dir)
-      fs::dir_delete(pres_dir)
+      if (dir.exists(handout.dir)) fs::dir_delete(handout_dir)
+      if (dir.exists(pres_dir)) fs::dir_delete(pres_dir)
 
       cli::cli_abort(
         "`make_materials()` errored with the following error, quitting while \
@@ -147,7 +148,7 @@ theme_eppi <- function() {
 #' `<daedalus_country>`.
 #'
 #' @param currency A string for the currency or currency symbol to include in
-#' the column header. Default to the US dollar symbol "$".
+#' the column header. Defaults to the US dollar symbol "$".
 #'
 #' @return A `knitr::kable()` table.
 #'
