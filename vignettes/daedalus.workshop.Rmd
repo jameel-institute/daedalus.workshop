@@ -32,13 +32,13 @@ make_materials(
 )
 ```
 
-The function creates two sub-directories: `handout/` and `pres_phase_02/` with the following structure.
-
 It is only intended to be used once: to generate the `.Rmd` files for the handout and phase two presentation.
 
 **Note that** by default, the function also runs `rmarkdown::render()` on the generated `.Rmd` files to produce PDF (handout) and HTML slideshow output (presentation).
 
 **Note that** re-running `make_materials()` will fail as the directories to be created already exist; this is to prevent users' unsaved or untracked changes being overwritten.
+
+The function creates two sub-directories: `handout/` and `pres_phase_02/` with the following structure, when `render = TRUE`.
 
 ```sh
 .
@@ -62,7 +62,7 @@ It is only intended to be used once: to generate the `.Rmd` files for the handou
         └── response.Rmd
 ```
 
-Users can use the handout PDF file `handout.pdf` as is, or modify `handout.Rmd` and re-knit it using the _knitr_ package.
+Users can use the handout PDF file `handout.pdf` as is, or modify `handout.Rmd` and render it using the _rmarkdown_ package using `rmarkdown::render()`.
 Note that RStudio also provides a 'knit' button when an `.Rmd` file is open.
 
 Alternatively, users can use the figures generated in `handout/figures/` to populate another document or presentation (such as an online Word document).
@@ -90,7 +90,7 @@ An example would be changing the figure names or colour scheme.
 
 ## Modifying the presentation source
 
-The phase two presentation file is aimed at showing workshop participants the outcomes of their chosen strategy in comparison with the counterfactual an unmitigated epidemic.
+The phase two presentation file is aimed at showing workshop participants the outcomes of their chosen strategy in comparison with the counterfactual of an unmitigated epidemic.
 
 The presentation takes the form of a [Reveal.js powered HTML](https://revealjs.com/) file that can be shown in a web browser.
 Formatting options for the file should be specified in `pres_phase_02/pres_phase_02.Rmd` and are documented in the [RMarkdown book section on Reveal.js presentations](https://pkg.yihui.org/rmarkdown-book/revealjs).

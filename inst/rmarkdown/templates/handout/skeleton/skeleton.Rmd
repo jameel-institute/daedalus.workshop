@@ -344,7 +344,7 @@ make_hcap_breaches_table(tables_out)
 make_deaths_by_age_table(tables_out)
 ```
 
-### Domain-specific costs (millions USD)
+### Domain-specific costs (millions {{ currency }})
 
 ```{r domain_specific_costs}
 make_domain_costs_table(tables_out, "{{ currency }}")
