@@ -91,7 +91,7 @@ day_now <- t0
 horizon <- horizon
 ```
 
-```{r inject-projections, child="response.Rmd", echo=FALSE}
+```{r inject-response, child="response.Rmd", echo=FALSE}
 ```
 
 ```{r hosp_cap}

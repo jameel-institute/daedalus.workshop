@@ -11,11 +11,6 @@ Automate the generation of pandemic response workshop materials using the Daedal
 \author{
 \strong{Maintainer}: Pratik Gupte \email{pratik.gupte@lshtm.ac.uk} (\href{https://orcid.org/0000-0001-5294-7819}{ORCID})
 
-Authors:
-\itemize{
-  \item Pratik Gupte \email{pratik.gupte@lshtm.ac.uk} (\href{https://orcid.org/0000-0001-5294-7819}{ORCID})
-}
-
 Other contributors:
 \itemize{
   \item Abdul Latif Jameel Institute for Disease and Emergency Analytics [funder]

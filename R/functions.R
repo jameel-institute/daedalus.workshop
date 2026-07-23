@@ -19,7 +19,7 @@
 #' @param workshop_name The workshop name. Intended to be used as a sub-title.
 #'
 #' @param date The workshop date as a string. Defaults to the current date.
-#' 
+#'
 #' @param currency A string for the currency name or symbol to be used. A symbol
 #' is preferred as the final use is in the form `"<symbol>M"` to indicate
 #' millions in `currency`.
