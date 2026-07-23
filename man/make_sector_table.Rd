@@ -11,7 +11,7 @@ make_sector_table(country, currency = "$")
 \verb{<daedalus_country>}.}
 
 \item{currency}{A string for the currency or currency symbol to include in
-the column header. Default to the US dollar symbol "$".}
+the column header. Defaults to the US dollar symbol "$".}
 }
 \value{
 A \code{knitr::kable()} table.

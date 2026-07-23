@@ -65,6 +65,8 @@ country <- daedalus_country("{{ country }}")
 disease <- "{{ disease }}"
 infection <- daedalus_infection(disease) # to align with daedalus() arg names
 
+currency <- "{{ currency }}"
+
 n_samples <- {{ n_samples }}
 
 t0 <- {{ t0 }}
@@ -327,7 +329,7 @@ knitr::include_graphics(
 ## GVA and contacts for each economic sector
 
 ```{r sector_gva_contacts}
-make_sector_table(country, "{{ currency }}")
+make_sector_table(country, currency)
 ```
 
 ## Risk of exceeding hospital capacity
@@ -347,11 +349,11 @@ make_deaths_by_age_table(tables_out)
 ### Domain-specific costs (millions {{ currency }})
 
 ```{r domain_specific_costs}
-make_domain_costs_table(tables_out, "{{ currency }}")
+make_domain_costs_table(tables_out, currency)
 ```
 
-### Economic costs due to closures and absences (millions USD)
+### Economic costs due to closures and absences (millions {{ currency }})
 
 ```{r econ_costs_breakdown}
-make_econ_cost_table(tables_out, "{{ currency }}")
+make_econ_cost_table(tables_out, currency)
 ```
