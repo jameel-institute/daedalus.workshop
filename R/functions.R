@@ -38,15 +38,6 @@ make_materials <- function(
   currency = "$",
   render = TRUE
 ) {
-  # makes handout
-  rmarkdown::draft(
-    "handout",
-    "handout",
-    "daedalus.workshop",
-    TRUE,
-    edit = FALSE
-  )
-
   handout_dir <- "handout"
   pres_dir <- "pres_phase_02"
 
@@ -65,7 +56,14 @@ make_materials <- function(
 
   tryCatch(
     {
-      # makes drafted Rmd independent of params
+      rmarkdown::draft(
+        "handout",
+        "handout",
+        "daedalus.workshop",
+        TRUE,
+        edit = FALSE
+      )
+
       writeLines(
         knitr::knit_expand(
           handout_path,
@@ -110,8 +108,12 @@ make_materials <- function(
     },
     error = function(e) {
       # clean up dirs
-      if (dir.exists(handout.dir)) fs::dir_delete(handout_dir)
-      if (dir.exists(pres_dir)) fs::dir_delete(pres_dir)
+      if (dir.exists(handout_dir)) {
+        fs::dir_delete(handout_dir)
+      }
+      if (dir.exists(pres_dir)) {
+        fs::dir_delete(pres_dir)
+      }
 
       cli::cli_abort(
         "`make_materials()` errored with the following error, quitting while \
