@@ -40,7 +40,7 @@ _daedalus.workshop_ is a package that helps to prepare materials for pandemic re
 # )
 ``` -->
 
-You can install this package from GitHub [GitHub](https://github.com/) with:
+You can install this package from [GitHub](https://github.com/) with:
 
 ```r
 install.packages("pak")
@@ -57,10 +57,15 @@ _daedalus.workshop_ can be used with the main function, `make_materials()`, whic
 make_materials(
   country = "GBR", disease = "influenza_2009",
   t0 = 30, horizon = 100,
-  n_samples = 25
+  n_samples = 25,
+  render = TRUE
 )
 ```
+
+See the ["Get started" page in the package documentation](articles/daedalus.workshop.html) for more on modifying outputs.
 
 ## Related projects
 
 - [_daedalus_](https://github.com/jameel-institute/daedalus.git) and family of packages for integrated epidemiological-economic modelling.
+
+- The organisation of _daedalus.workshop_ draws from the [Epiverse-TRACE package _episoap_](https://epiverse-trace.github.io/episoap/), but the core aim is quickly generating literate programming material from a template rather than a fully reproducible report.
