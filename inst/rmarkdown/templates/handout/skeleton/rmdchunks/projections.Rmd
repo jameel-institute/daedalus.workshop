@@ -344,7 +344,7 @@ plot_daily_cases_unmit_explainer <-
     fill = "Proj. interv."
   ) +
   # xlim(0, 60) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi()
 
 ggsave(
@@ -390,7 +390,7 @@ plot_daily_infections_unmit <-
     fill = "Proj. interv."
   ) +
   xlim(20, 60) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi()
 
 ggsave(
@@ -440,7 +440,7 @@ plot_daily_cases_unmit <-
     fill = "Proj. interv."
   ) +
   xlim(20, 60) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi()
 
 ggsave(
@@ -494,7 +494,7 @@ pwalk(
         caption = "Please consider that there is under-ascertainment."
       ) +
       xlim(20, 60) +
-      theme_bw(base_size = 24, base_family = "Arial") +
+      theme_bw(base_size = 24) +
       theme_eppi()
 
     if (m %in% c("total_hosp", "daily_hospitalisations")) {
@@ -578,7 +578,7 @@ plot_unmit_epi_summary <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi() +
   theme(axis.text.x = element_blank())
 
@@ -633,7 +633,7 @@ plot_unmit_deaths_by_age <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi()
 
 ggsave(
@@ -687,7 +687,7 @@ plot_cfr_by_age <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi()
 
 ggsave(
@@ -754,7 +754,7 @@ plot_unmit_gva_loss <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 ggsave(
@@ -837,7 +837,7 @@ pwalk(
         )
       ) +
       xlim(20, 60) +
-      theme_bw(base_size = 24, base_family = "Arial") +
+      theme_bw(base_size = 24) +
       theme_eppi()
 
     if (m %in% c("total_hosp", "daily_hospitalisations")) {
@@ -917,7 +917,7 @@ pwalk(
         )
       ) +
       xlim(20, 60) +
-      theme_bw(base_size = 24, base_family = "Arial") +
+      theme_bw(base_size = 24) +
       theme_eppi()
 
     if (m %in% c("total_hosp", "daily_hospitalisations")) {
@@ -1009,7 +1009,7 @@ plot_compare_epi_summary <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 filename <- glue::glue(file.path(figs_out, "plot_compare_epi_summary.png"))
@@ -1095,7 +1095,7 @@ plot_compare_deaths_by_age <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 ggsave(
@@ -1161,7 +1161,7 @@ plot_compare_deaths_by_age <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 ggsave(
@@ -1251,7 +1251,7 @@ plot_compare_gva_loss <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 ggsave(
@@ -1310,7 +1310,7 @@ plot_compare_gva_loss <-
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 ggsave(
@@ -1381,7 +1381,7 @@ plot_compare_econ_cost_absences <-
     col = "Proj. interv.",
     caption = "Economic losses from worker absences due to illness or death."
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi() +
   guides(
     colour = guide_legend(
@@ -1424,7 +1424,7 @@ plot_compare_econ_cost_closures <-
     col = "Proj. interv.",
     caption = "Economic losses from economic sector closures."
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 
 ggsave(

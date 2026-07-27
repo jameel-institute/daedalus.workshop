@@ -93,6 +93,9 @@ test_that("make_materials() cleans up output directories on error", {
   })
 })
 
+# this test only runs on systems with tinytex as the latex installation
+# which I expect to be CI systems. Use the function has_pdflatex to trigger
+# local runs
 test_that("make_materials() produces rendered pdf and html output", {
   skip_if_not(tinytex::is_tinytex())
 

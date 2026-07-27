@@ -288,7 +288,7 @@ plots_epi_curves <- Map(
         y = l,
         fill = "Proj. interv."
       ) +
-      theme_bw(base_size = 24, base_family = "Arial") +
+      theme_bw(base_size = 24) +
       theme_eppi()
 
     if (m == "total_hosp") {
@@ -361,7 +361,7 @@ plot_epi_summary <- ggplot(
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(base_size = 24, base_family = "Arial") +
+  theme_bw(base_size = 24) +
   theme_eppi() +
   theme(axis.text.x = element_blank())
 ```
@@ -418,7 +418,7 @@ plot_deaths_by_age <- ggplot(data_deaths) +
     )
   ) +
   theme_bw(
-    base_size = 24, base_family = "Arial"
+    base_size = 24
   ) +
   theme_eppi()
 ```
@@ -484,6 +484,6 @@ plot_econ_losses <- ggplot(data_cost_output) +
       override.aes = list(linewidth = 3)
     )
   ) +
-  theme_bw(24, "Arial") +
+  theme_bw(24) +
   theme_eppi()
 ```

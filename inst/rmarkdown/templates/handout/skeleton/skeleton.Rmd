@@ -28,8 +28,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   message = FALSE,
   warning = FALSE,
-  out.width = "70%",
-  fig.showtext = TRUE
+  out.width = "70%"
 )
 ```
 
