@@ -1,18 +1,140 @@
-# ji-rpkg-template
+# Using daedalus.workshop
+
+*daedalus.workshop* is intended to be at least a partial replacement for
+the manual replication of workshop code and informational text and
+tables to generate materials for a new pandemic response workshop using
+[the Daedalus model](https://jameel-institute.github.io/daedalus/).
+
+The intended way to use *daedalus.workshop* is to run the main function,
+[`make_materials()`](../reference/make_materials.md), which prepares
+directories and workshop-relevant outputs in the current working
+directory.
 
 ``` r
 
+# code not run
+# supports some country parameters
 library(daedalus.workshop)
+
+make_materials(
+  country = "GBR", disease = "influenza_2009",
+  t0 = 30, horizon = 100,
+  n_samples = 25,
+  render = TRUE
+)
 ```
 
-## Quick start
+It is only intended to be used once: to generate the `.Rmd` files for
+the handout and phase two presentation.
 
-Use the main function
-[`make_materials()`](../reference/make_materials.md) to generate
-workshop materials.
+**Note that** by default, the function also runs
+[`rmarkdown::render()`](https://pkgs.rstudio.com/rmarkdown/reference/render.html)
+on the generated `.Rmd` files to produce PDF (handout) and HTML
+slideshow output (presentation).
 
-``` r
+**Note that** re-running
+[`make_materials()`](../reference/make_materials.md) will fail as the
+directories to be created already exist; this is to prevent users’
+unsaved or untracked changes being overwritten.
 
-# set render=FALSE to prevent rendering
-make_materials("GBR", "sars_cov_1", render = FALSE)
+The function creates two sub-directories: `handout/` and
+`pres_phase_02/` with the following structure, when `render = TRUE`.
+
+``` sh
+.
+├── handout
+│   ├── figures  [27 entries exceeds filelimit, not opening dir]
+│   ├── handout.pdf
+│   ├── handout.Rmd
+│   ├── rmdchunks
+│   │   ├── projections.Rmd
+│   │   └── table_mitigation.Rmd
+│   └── tables
+│       ├── table_cost_by_response.csv
+│       ├── table_deaths_by_age.csv
+│       ├── table_econ_cost_breakdown.csv
+│       └── table_hcap_breaches.csv
+└── pres_phase_02
+    ├── pres_phase_02.html
+    ├── pres_phase_02.Rmd
+    └── rmdchunks
+        ├── projections.Rmd
+        └── response.Rmd
 ```
+
+Users can use the handout PDF file `handout.pdf` as is, or modify
+`handout.Rmd` and render it using the *rmarkdown* package using
+[`rmarkdown::render()`](https://pkgs.rstudio.com/rmarkdown/reference/render.html).
+Note that RStudio also provides a ‘knit’ button when an `.Rmd` file is
+open.
+
+Alternatively, users can use the figures generated in `handout/figures/`
+to populate another document or presentation (such as an online Word
+document).
+
+Users will need to modify the phase two presentation file per the
+workshop participants’ choices. This mostly involves modifying the
+chosen response strategy in the file `rmdchunks/response.Rmd`.
+
+## Modifying the handout source
+
+The handout file source is `handout/handout.Rmd`. Editing the formatting
+requires users to modify:
+
+1.  YAML header specifying document attributes and content such as the
+    title, author name, and date, as well as the document class (KOMA
+    Script report by default), font family (“tgtermes”, a Times New
+    Roman look-alike) and page margins.
+
+2.  The YAML header field ‘output’ has further options for LaTeX to PDF
+    output, including formatting for the table of contents, the
+    numbering depth for sections, and LaTeX dependencies.
+
+3.  Users can add or modify options after consulting the
+    [*knitr*](https://yihui.org/knitr/),
+    [*rmarkdown*](https://rmarkdown.rstudio.com/), and
+    [*bookdown*](https://pkg.yihui.org/bookdown/) documentation. This
+    includes specifying the LaTeX typesetter.
+
+4.  Advanced LaTeX users can also insert raw LaTeX code into the
+    document to force formatting options.
+
+### Modifying the initial projections source
+
+The model projections and figures are generated from the file
+`handout/rmdchunks/projections.Rmd`; modify this file as needed to get
+the output needed. An example would be changing the figure names or
+colour scheme.
+
+## Modifying the presentation source
+
+The phase two presentation file is aimed at showing workshop
+participants the outcomes of their chosen strategy in comparison with
+the counterfactual of an unmitigated epidemic.
+
+The presentation takes the form of a [Reveal.js powered
+HTML](https://revealjs.com/) file that can be shown in a web browser.
+Formatting options for the file should be specified in
+`pres_phase_02/pres_phase_02.Rmd` and are documented in the [RMarkdown
+book section on Reveal.js
+presentations](https://pkg.yihui.org/rmarkdown-book/revealjs).
+
+The chosen response — or multiple responses — can be specified in
+`pres_phase_02/rmdchunks/response.Rmd`.
+
+### Modifying the phase 2 projections source
+
+The model projections and figures are generated from the file
+`pres_phase_02/rmdchunks/projections.Rmd`; modify this file as needed to
+get the output needed. An example would be changing the figure names or
+colour scheme.
+
+## Related projects
+
+- [*daedalus*](https://github.com/jameel-institute/daedalus.git) and
+  family of packages for integrated epidemiological-economic modelling.
+
+- The organisation of *daedalus.workshop* draws from the [Epiverse-TRACE
+  package *episoap*](https://epiverse-trace.github.io/episoap/), but the
+  core aim is quickly generating literate programming material from a
+  template rather than a fully reproducible report.

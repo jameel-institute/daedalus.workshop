@@ -12,6 +12,8 @@ make_materials(
   horizon = 100,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
+  date = as.character(Sys.Date()),
+  currency = "$",
   render = TRUE
 )
 ```
@@ -42,6 +44,16 @@ make_materials(
 - workshop_name:
 
   The workshop name. Intended to be used as a sub-title.
+
+- date:
+
+  The workshop date as a string. Defaults to the current date.
+
+- currency:
+
+  A string for the currency name or symbol to be used. A symbol is
+  preferred as the final use is in the form `"<symbol>M"` to indicate
+  millions in `currency`.
 
 - render:
 

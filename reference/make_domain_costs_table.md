@@ -5,7 +5,7 @@ Make domain costs table
 ## Usage
 
 ``` r
-make_domain_costs_table(tables_out)
+make_domain_costs_table(tables_out, currency = "$")
 ```
 
 ## Arguments
@@ -13,6 +13,11 @@ make_domain_costs_table(tables_out)
 - tables_out:
 
   Location to table outputs.
+
+- currency:
+
+  A string for the currency or currency symbol to include in the column
+  header. Default to the US dollar symbol "\$".
 
 ## Value
 

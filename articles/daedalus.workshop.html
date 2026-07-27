@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>ji-rpkg-template • daedalus.workshop</title>
+<title>Using daedalus.workshop • daedalus.workshop</title>
 <!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
   window.MathJax = {
     chtml: {
@@ -18,7 +18,7 @@
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="ji-rpkg-template">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Using daedalus.workshop">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -28,7 +28,7 @@
     <a href="https://www.imperial.ac.uk/jameel-institute/" class="external-link"><img src="https://raw.githubusercontent.com/jameel-institute/jameelinst.rpkg.theme/refs/heads/main/inst/pkgdown/assets/logo_imperial_jameel.svg" id="logo" alt="Abdul Latif Jameel Institute for Disease and Emergency Analytics"></a>
     <a class="navbar-brand me-2" href="../index.html">daedalus.workshop</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Unreleased version">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/daedalus.workshop.html">ji-rpkg-template</a></li>
+<li><a class="dropdown-item" href="../articles/daedalus.workshop.html">Using daedalus.workshop</a></li>
     <li><a class="dropdown-item" href="../articles/design_decisions.html">Design decisions</a></li>
   </ul>
 </li>
@@ -72,7 +72,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>ji-rpkg-template</h1>
+      <h1>Using daedalus.workshop</h1>
             
       
 
@@ -81,18 +81,132 @@
 
     
     
+<p><em>daedalus.workshop</em> is intended to be at least a partial
+replacement for the manual replication of workshop code and
+informational text and tables to generate materials for a new pandemic
+response workshop using <a href="https://jameel-institute.github.io/daedalus/" class="external-link">the Daedalus
+model</a>.</p>
+<p>The intended way to use <em>daedalus.workshop</em> is to run the main
+function, <code><a href="../reference/make_materials.html">make_materials()</a></code>, which prepares directories and
+workshop-relevant outputs in the current working directory.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">daedalus.workshop</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># code not run</span></span>
+<span><span class="co"># supports some country parameters</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">daedalus.workshop</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/make_materials.html">make_materials</a></span><span class="op">(</span></span>
+<span>  country <span class="op">=</span> <span class="st">"GBR"</span>, disease <span class="op">=</span> <span class="st">"influenza_2009"</span>,</span>
+<span>  t0 <span class="op">=</span> <span class="fl">30</span>, horizon <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  n_samples <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  render <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>It is only intended to be used once: to generate the
+<code>.Rmd</code> files for the handout and phase two presentation.</p>
+<p><strong>Note that</strong> by default, the function also runs
+<code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">rmarkdown::render()</a></code> on the generated <code>.Rmd</code>
+files to produce PDF (handout) and HTML slideshow output
+(presentation).</p>
+<p><strong>Note that</strong> re-running <code><a href="../reference/make_materials.html">make_materials()</a></code>
+will fail as the directories to be created already exist; this is to
+prevent users’ unsaved or untracked changes being overwritten.</p>
+<p>The function creates two sub-directories: <code>handout/</code> and
+<code>pres_phase_02/</code> with the following structure, when
+<code>render = TRUE</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="bu">.</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">├──</span> handout</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="ex">│  </span> ├── figures  [27 entries exceeds filelimit, not opening dir]</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="ex">│  </span> ├── handout.pdf</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="ex">│  </span> ├── handout.Rmd</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="ex">│  </span> ├── rmdchunks</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="ex">│  </span> │   ├── projections.Rmd</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="ex">│  </span> │   └── table_mitigation.Rmd</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="ex">│  </span> └── tables</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="ex">│  </span>     ├── table_cost_by_response.csv</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="ex">│  </span>     ├── table_deaths_by_age.csv</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="ex">│  </span>     ├── table_econ_cost_breakdown.csv</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="ex">│  </span>     └── table_hcap_breaches.csv</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="ex">└──</span> pres_phase_02</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>    <span class="ex">├──</span> pres_phase_02.html</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>    <span class="ex">├──</span> pres_phase_02.Rmd</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>    <span class="ex">└──</span> rmdchunks</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>        <span class="ex">├──</span> projections.Rmd</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>        <span class="ex">└──</span> response.Rmd</span></code></pre></div>
+<p>Users can use the handout PDF file <code>handout.pdf</code> as is, or
+modify <code>handout.Rmd</code> and render it using the
+<em>rmarkdown</em> package using <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">rmarkdown::render()</a></code>. Note
+that RStudio also provides a ‘knit’ button when an <code>.Rmd</code>
+file is open.</p>
+<p>Alternatively, users can use the figures generated in
+<code>handout/figures/</code> to populate another document or
+presentation (such as an online Word document).</p>
+<p>Users will need to modify the phase two presentation file per the
+workshop participants’ choices. This mostly involves modifying the
+chosen response strategy in the file
+<code>rmdchunks/response.Rmd</code>.</p>
 <div class="section level2">
-<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+<h2 id="modifying-the-handout-source">Modifying the handout source<a class="anchor" aria-label="anchor" href="#modifying-the-handout-source"></a>
 </h2>
-<p>Use the main function <code><a href="../reference/make_materials.html">make_materials()</a></code> to generate
-workshop materials.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># set render=FALSE to prevent rendering</span></span>
-<span><span class="fu"><a href="../reference/make_materials.html">make_materials</a></span><span class="op">(</span><span class="st">"GBR"</span>, <span class="st">"sars_cov_1"</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>The handout file source is <code>handout/handout.Rmd</code>. Editing
+the formatting requires users to modify:</p>
+<ol style="list-style-type: decimal">
+<li><p>YAML header specifying document attributes and content such as
+the title, author name, and date, as well as the document class (KOMA
+Script report by default), font family (“tgtermes”, a Times New Roman
+look-alike) and page margins.</p></li>
+<li><p>The YAML header field ‘output’ has further options for LaTeX to
+PDF output, including formatting for the table of contents, the
+numbering depth for sections, and LaTeX dependencies.</p></li>
+<li><p>Users can add or modify options after consulting the <a href="https://yihui.org/knitr/" class="external-link"><em>knitr</em></a>, <a href="https://rmarkdown.rstudio.com/" class="external-link"><em>rmarkdown</em></a>, and <a href="https://pkg.yihui.org/bookdown/" class="external-link"><em>bookdown</em></a>
+documentation. This includes specifying the LaTeX typesetter.</p></li>
+<li><p>Advanced LaTeX users can also insert raw LaTeX code into the
+document to force formatting options.</p></li>
+</ol>
+<div class="section level3">
+<h3 id="modifying-the-initial-projections-source">Modifying the initial projections source<a class="anchor" aria-label="anchor" href="#modifying-the-initial-projections-source"></a>
+</h3>
+<p>The model projections and figures are generated from the file
+<code>handout/rmdchunks/projections.Rmd</code>; modify this file as
+needed to get the output needed. An example would be changing the figure
+names or colour scheme.</p>
 </div>
-  </main>
+</div>
+<div class="section level2">
+<h2 id="modifying-the-presentation-source">Modifying the presentation source<a class="anchor" aria-label="anchor" href="#modifying-the-presentation-source"></a>
+</h2>
+<p>The phase two presentation file is aimed at showing workshop
+participants the outcomes of their chosen strategy in comparison with
+the counterfactual of an unmitigated epidemic.</p>
+<p>The presentation takes the form of a <a href="https://revealjs.com/" class="external-link">Reveal.js powered HTML</a> file that can be
+shown in a web browser. Formatting options for the file should be
+specified in <code>pres_phase_02/pres_phase_02.Rmd</code> and are
+documented in the <a href="https://pkg.yihui.org/rmarkdown-book/revealjs" class="external-link">RMarkdown book
+section on Reveal.js presentations</a>.</p>
+<p>The chosen response — or multiple responses — can be specified in
+<code>pres_phase_02/rmdchunks/response.Rmd</code>.</p>
+<div class="section level3">
+<h3 id="modifying-the-phase-2-projections-source">Modifying the phase 2 projections source<a class="anchor" aria-label="anchor" href="#modifying-the-phase-2-projections-source"></a>
+</h3>
+<p>The model projections and figures are generated from the file
+<code>pres_phase_02/rmdchunks/projections.Rmd</code>; modify this file
+as needed to get the output needed. An example would be changing the
+figure names or colour scheme.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="related-projects">Related projects<a class="anchor" aria-label="anchor" href="#related-projects"></a>
+</h2>
+<ul>
+<li><p><a href="https://github.com/jameel-institute/daedalus.git" class="external-link"><em>daedalus</em></a>
+and family of packages for integrated epidemiological-economic
+modelling.</p></li>
+<li><p>The organisation of <em>daedalus.workshop</em> draws from the <a href="https://epiverse-trace.github.io/episoap/" class="external-link">Epiverse-TRACE package
+<em>episoap</em></a>, but the core aim is quickly generating literate
+programming material from a template rather than a fully reproducible
+report.</p></li>
+</ul>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
@@ -102,7 +216,7 @@ workshop materials.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

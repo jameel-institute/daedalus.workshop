@@ -2,5 +2,5 @@
 
 ### All vignettes
 
-- [ji-rpkg-template](daedalus.workshop.md):
+- [Using daedalus.workshop](daedalus.workshop.md):
 - [Design decisions](design_decisions.md):
