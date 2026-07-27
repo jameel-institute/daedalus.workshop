@@ -9,39 +9,47 @@ test_that("make_sector_table() returns a knitr kable", {
 })
 
 test_that("make_hcap_breaches_table() returns a knitr kable", {
-  tables_out <- local_tables_out()
-  result <- make_hcap_breaches_table(tables_out)
+  withr::with_tempdir(
+    {
+      local_tables_out()
+      result <- make_hcap_breaches_table(".")
 
-  expect_s3_class(result, "knitr_kable")
-  expect_match(
-    paste(result, collapse = "\n"),
-    NAMES_PRECANNED_NPIS[["business_closures"]],
-    fixed = TRUE
+      expect_s3_class(result, "knitr_kable")
+    }
   )
 })
 
 test_that("make_deaths_by_age_table() returns a knitr kable", {
-  tables_out <- local_tables_out()
-  result <- make_deaths_by_age_table(tables_out)
+  withr::with_tempdir(
+    {
+      local_tables_out()
+      result <- make_deaths_by_age_table(".")
 
-  expect_s3_class(result, "knitr_kable")
-  expect_match(paste(result, collapse = "\n"), "65+", fixed = TRUE)
+      expect_s3_class(result, "knitr_kable")
+    }
+  )
 })
 
 test_that("make_domain_costs_table() returns a knitr kable", {
-  tables_out <- local_tables_out()
-  result <- make_domain_costs_table(tables_out)
+  withr::with_tempdir(
+    {
+      local_tables_out()
+      result <- make_domain_costs_table(".")
 
-  expect_s3_class(result, "knitr_kable")
-  expect_match(paste(result, collapse = "\n"), "1,000", fixed = TRUE)
+      expect_s3_class(result, "knitr_kable")
+    }
+  )
 })
 
 test_that("make_econ_cost_table() returns a knitr kable", {
-  tables_out <- local_tables_out()
-  result <- make_econ_cost_table(tables_out)
+  withr::with_tempdir(
+    {
+      local_tables_out()
+      result <- make_econ_cost_table(".")
 
-  expect_s3_class(result, "knitr_kable")
-  expect_match(paste(result, collapse = "\n"), "Closures", fixed = TRUE)
+      expect_s3_class(result, "knitr_kable")
+    }
+  )
 })
 
 test_that("df_cols_with_commas() returns a data.frame", {

@@ -54,6 +54,11 @@ make_materials <- function(
   checkmate::assert_string(date)
   checkmate::assert_string(currency)
 
+  # not checking pandoc as this is a sys req for rmarkdown
+  if (render) {
+    has_pdflatex()
+  }
+
   tryCatch(
     {
       rmarkdown::draft(
@@ -131,7 +136,7 @@ make_materials <- function(
 #'
 #' @export
 theme_eppi <- function() {
-  ggplot2::theme_bw(base_size = 24, base_family = "Arial") +
+  ggplot2::theme_bw(base_size = 24) +
     ggplot2::theme(
       legend.position = "top",
       panel.grid.major = ggplot2::element_line(
