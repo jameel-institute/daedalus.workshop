@@ -56,7 +56,7 @@ make_materials <- function(
 
   # not checking pandoc as this is a sys req for rmarkdown
   if (render) {
-    has_pdflatex()
+    check_pdflatex()
   }
 
   tryCatch(
