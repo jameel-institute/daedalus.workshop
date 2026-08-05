@@ -120,7 +120,6 @@ ggsave(
 ```{r timepoints}
 # taken from injected params
 day_now <- t0
-horizon <- horizon
 ```
 
 ```{r response_levels}
