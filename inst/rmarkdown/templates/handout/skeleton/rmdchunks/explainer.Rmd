@@ -1,0 +1,232 @@
+
+```{r setup_explainer}
+# TODO: remove
+# t0 <- 30
+# horizon <- 100
+
+npi <- daedalus_timed_npi(
+  t0, horizon, list(rep(0.9, 45)), country
+)
+elim <- daedalus_timed_npi(
+  t0, horizon, list(rep(0.7, 45)), country
+)
+
+# gives an epi curve that fits illustrative purposes well
+# tweak this to get a curve that suits the t0 and horizon chosen
+# the infection is purely illustrative; need not match the workshop infection
+explainer_infection <- daedalus_infection("sars_cov_1", r0 = 3)
+
+default <- daedalus(country, explainer_infection, time_end = horizon)
+mitigated <- daedalus(country, explainer_infection, npi, time_end = horizon)
+eliminated <- daedalus(country, explainer_infection, elim, time_end = horizon)
+
+ts_default <- get_incidence(default, "infections")
+ts_mitigated <- get_incidence(mitigated, "infections")
+ts_eliminated <- get_incidence(eliminated, "infections")
+
+ts_default$scenario <- "default"
+ts_mitigated$scenario <- "mitigated"
+ts_eliminated$scenario <- "eliminated"
+
+df_explainer <- bind_rows(ts_default, ts_mitigated, ts_eliminated)
+```
+
+```{r explainer_p_01}
+plot_explainer_1 <- ggplot(df_explainer) +
+  geom_line(
+    aes(time, value, linetype = scenario),
+  ) +
+  geom_vline(,
+    xintercept = c(t0, horizon),
+    linetype = "dashed",
+    colour = c("red", "grey")
+  ) +
+  scale_x_continuous(
+    breaks = c(t0, seq(0, horizon, by = horizon / 4)),
+    labels = function(x) {
+        def_labs <- glue::glue("Day {round(x)}")
+        def_labs[x == 0] <- glue::glue(
+            "Day 0
+            
+            First detected
+            case in {country}"
+        )
+        def_labs[x == horizon] <- glue::glue(
+            "Day {horizon}
+
+            End of projection horizon"
+        )
+        def_labs[x == t0] <- glue::glue(
+            "
+            
+
+            Day {t0}: Start of exercise"
+        )
+
+        def_labs
+    },
+    limits = c(0, horizon * 1.2)
+  ) +
+  scale_linetype_discrete(
+    labels = c("No closures", "Severe mitigation", "Loose mitigation")
+  ) +
+  labs(
+    x = "Timeline",
+    y = "Number of detected cases",
+    linetype = NULL
+  ) +
+  theme_explainer()
+
+ggsave(
+  file.path(figs_out, "plot_explainer_01.png"),
+  plot_explainer_1, height = 7, width = 10
+)
+```
+
+```{r explainer_p_02}
+# get 10 samples of daily incidence under a plausible mitigation strategy
+explainer_infection <- withr::with_seed(
+    1,
+    {
+        make_infection_samples(
+            "sars_cov_1",
+            samples = 10,
+            list(
+                r0 = distributional::dist_beta(2, 5),
+                sigma = distributional::dist_beta(2, 5)
+            ),
+            list(r0 = c(2.5, 3.0), sigma = c(0.2, 0.4))
+        )
+    }
+)
+
+outputs <- run_scenarios(
+    country, explainer_infection, response_strategy = npi, time_end = horizon
+)
+tags <- glue::glue(
+    "infection_{seq_along(explainer_infection)}"
+)
+df_uncertainty <- get_epicurve_data(outputs, tags)
+df_uncertainty <- filter(df_uncertainty, measure == "daily_infections")
+
+# plot uncertainty as curves
+plot_explainer_2 <- ggplot(df_uncertainty) +
+  geom_line(
+    aes(time, value, group = tag),
+    colour = "grey40", linetype = "dashed"
+  ) +
+  geom_vline(,
+    xintercept = c(t0, horizon),
+    linetype = "dashed",
+    colour = c("red", "grey")
+  ) +
+  scale_x_continuous(
+    breaks = c(t0, seq(0, horizon, by = horizon / 4)),
+    labels = function(x) {
+        def_labs <- glue::glue("Day {round(x)}")
+        def_labs[x == 0] <- glue::glue(
+            "Day 0
+            
+            First detected
+            case in {country}"
+        )
+        def_labs[x == horizon] <- glue::glue(
+            "Day {horizon}
+
+            End of projection horizon"
+        )
+        def_labs[x == t0] <- glue::glue(
+            "
+            
+
+            Day {t0}: Start of exercise"
+        )
+
+        def_labs
+    },
+    limits = c(0, horizon * 1.2)
+  ) +
+  scale_linetype_discrete(
+    labels = c("No closures", "Severe mitigation", "Loose mitigation")
+  ) +
+  labs(
+    x = "Timeline",
+    y = "Number of detected cases",
+    linetype = NULL
+  ) +
+  theme_explainer()
+
+ggsave(
+  file.path(figs_out, "plot_explainer_02.png"),
+  plot_explainer_2, height = 7, width = 10
+)
+```
+
+```{r explainer_p_03}
+# get 10 samples of daily incidence under a plausible mitigation strategy
+explainer_infection <- withr::with_seed(
+    1,
+    {
+        make_infection_samples(
+            "sars_cov_1",
+            samples = 10,
+            list(
+                r0 = distributional::dist_beta(2, 5),
+                sigma = distributional::dist_beta(2, 4)
+            ),
+            list(r0 = c(2.6, 2.65), sigma = c(0.2, 0.4))
+        )
+    }
+)
+
+horizon_new <- horizon * 2
+
+npi <- daedalus_timed_npi(
+  t0, horizon_new, list(rep(0.9, 45)), country
+)
+
+outputs <- run_scenarios(
+    country, explainer_infection,
+    response_strategy = npi, time_end = horizon_new
+)
+tags <- glue::glue(
+    "infection_{seq_along(explainer_infection)}"
+)
+df_uncertainty <- get_epicurve_data(outputs, tags)
+df_uncertainty <- filter(df_uncertainty, measure == "daily_infections")
+
+# plot uncertainty as curves
+plot_explainer_3 <- ggplot(df_uncertainty) +
+  stat_summary(
+        aes(time, value),
+        geom = "ribbon", fill = "grey80"
+    ) +
+  stat_summary(
+        aes(time, value),
+        geom = "line"
+    ) +
+  geom_vline(,
+    xintercept = c(t0, horizon),
+    linetype = "dashed",
+    colour = c("red", "grey")
+  ) +
+  scale_x_continuous(
+    breaks = c(0, t0, horizon, horizon_new),
+    labels = function(x) glue::glue("Day {round(x)}"),
+    limits = c(0, horizon_new * 1.1)
+  ) +
+  scale_linetype_discrete(
+    labels = c("No closures", "Severe mitigation", "Loose mitigation")
+  ) +
+  labs(
+    x = "Timeline",
+    y = "Number of detected cases",
+    linetype = NULL
+  ) +
+  theme_explainer()
+
+ggsave(
+  file.path(figs_out, "plot_explainer_03.png"),
+  plot_explainer_3, height = 7, width = 10
+)
+```
