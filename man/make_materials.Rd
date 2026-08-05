@@ -20,7 +20,7 @@ make_materials(
 \item{country}{The country name or three-letter ISO code.}
 
 \item{disease}{The disease name. Must be one of
-\link[daedalus.data:epidemic_data]{daedalus.data::epidemic_names}.}
+\link[daedalus.data:epidemic_names]{daedalus.data::epidemic_names}.}
 
 \item{t0}{The current time-point. Defaults to 30 days.}
 
