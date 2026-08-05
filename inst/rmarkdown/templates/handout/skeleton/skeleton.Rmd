@@ -73,6 +73,9 @@ horizon <- {{ horizon }}
 t_diff <- horizon - t0
 ```
 
+```{r inject-explainer, child="rmdchunks/explainer.Rmd", echo=FALSE}
+```
+
 ```{r inject-projections, child="rmdchunks/projections.Rmd", echo=FALSE}
 ```
 
@@ -106,15 +109,39 @@ The workshop concludes with a discussion of the choices and the use of modelling
 
 ### Initial projections
 
-**TODO: ADD DIAGRAM**
+```{r plot-explainer-01}
+#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
+#| shown below. Higher bars above values indicate that those values are more
+#| likely."
+
+knitr::include_graphics(
+  file.path(figs_out, "plot_explainer_01.png")
+)
+```
 
 ### Uncertainty around outcomes under chosen response
 
-**TODO: ADD DIAGRAM**
+```{r plot-explainer-02}
+#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
+#| shown below. Higher bars above values indicate that those values are more
+#| likely."
+
+knitr::include_graphics(
+  file.path(figs_out, "plot_explainer_02.png")
+)
+```
 
 ### Phase 2: Outcomes under chosen response
 
-**TODO: ADD DIAGRAM**
+```{r plot-explainer-03}
+#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
+#| shown below. Higher bars above values indicate that those values are more
+#| likely."
+
+knitr::include_graphics(
+  file.path(figs_out, "plot_explainer_03.png")
+)
+```
 
 ## The Daedalus Model
 
