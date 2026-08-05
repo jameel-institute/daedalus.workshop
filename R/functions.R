@@ -129,26 +129,6 @@ make_materials <- function(
   )
 }
 
-
-#' Theme for handout figures
-#'
-#' @return A `ggplot2` theme function that can be appended to a ggplot object.
-#'
-#' @export
-theme_eppi <- function() {
-  ggplot2::theme_bw(base_size = 24) +
-    ggplot2::theme(
-      legend.position = "top",
-      panel.grid.major = ggplot2::element_line(
-        colour = "grey"
-      ),
-      panel.grid.minor = ggplot2::element_line(
-        colour = "grey",
-        linetype = "dashed"
-      )
-    )
-}
-
 #' Make table of sector GVA and contacts
 #'
 #' @param country A country name, or a type that can be coerced to a
