@@ -71,6 +71,7 @@ n_samples <- {{ n_samples }}
 
 t0 <- {{ t0 }}
 horizon <- {{ horizon }}
+final_horizon <- {{ final_horizon }}
 t_diff <- horizon - t0
 ```
 
