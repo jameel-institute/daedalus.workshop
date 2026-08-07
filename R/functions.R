@@ -13,6 +13,10 @@
 #' @param t0 The current time-point. Defaults to 30 days.
 #'
 #' @param horizon The time horizon for projections. Defaults to 100 days.
+#' 
+#' @param final_horizon The time horizon for the final phase of the exercise,
+#' when participants are shown projections under their chosen mitigation
+#' strategy. This should be a value > `horizon`, and defaults to 2x horizon.
 #'
 #' @param n_samples The number of samples for parameter uncertainty. Default 10.
 #'
@@ -32,6 +36,7 @@ make_materials <- function(
   disease = "sars_cov_1",
   t0 = 30,
   horizon = 100,
+  final_horizon = horizon * 2,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
   date = as.character(Sys.Date()),
@@ -49,6 +54,7 @@ make_materials <- function(
 
   checkmate::assert_number(t0, lower = 0, finite = TRUE)
   checkmate::assert_number(horizon, lower = t0, finite = TRUE)
+  checkmate::assert_number(final_horizon, lower = horizon + 1, finite = TRUE)
   checkmate::assert_number(n_samples, lower = 10, finite = TRUE)
   checkmate::assert_string(workshop_name)
   checkmate::assert_string(date)
@@ -77,6 +83,7 @@ make_materials <- function(
           n_samples = n_samples,
           t0 = t0,
           horizon = horizon,
+          final_horizon = final_horizon,
           t_diff = horizon - t0,
           workshop_name = workshop_name,
           currency = currency
