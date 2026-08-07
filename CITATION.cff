@@ -14,12 +14,12 @@ abstract: Automate the generation of pandemic response workshop materials using 
 authors:
 - family-names: Gupte
   given-names: Pratik
-  email: pratik.gupte@lshtm.ac.uk
+  email: p.gupte24@imperial.ac.uk
   orcid: https://orcid.org/0000-0001-5294-7819
 contact:
 - family-names: Gupte
   given-names: Pratik
-  email: pratik.gupte@lshtm.ac.uk
+  email: p.gupte24@imperial.ac.uk
   orcid: https://orcid.org/0000-0001-5294-7819
 references:
 - type: software
