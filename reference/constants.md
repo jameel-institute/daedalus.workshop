@@ -16,18 +16,6 @@ FILE_ECON_COST_BREAKDOWN
 NAMES_PRECANNED_NPIS
 ```
 
-## Format
-
-An object of class `character` of length 1.
-
-An object of class `character` of length 1.
-
-An object of class `character` of length 1.
-
-An object of class `character` of length 1.
-
-An object of class `character` of length 4.
-
 ## Examples
 
 ``` r

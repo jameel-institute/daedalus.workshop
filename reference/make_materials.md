@@ -10,6 +10,7 @@ make_materials(
   disease = "sars_cov_1",
   t0 = 30,
   horizon = 100,
+  final_horizon = horizon * 2,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
   date = as.character(Sys.Date()),
@@ -36,6 +37,13 @@ make_materials(
 - horizon:
 
   The time horizon for projections. Defaults to 100 days.
+
+- final_horizon:
+
+  The time horizon for the final phase of the exercise, when
+  participants are shown projections under their chosen mitigation
+  strategy. This should be a value \> `horizon`, and defaults to 2x
+  horizon.
 
 - n_samples:
 

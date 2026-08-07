@@ -5,8 +5,13 @@ the Daedalus family of packages.
 
 ## Author
 
-**Maintainer**: Pratik Gupte <pratik.gupte@lshtm.ac.uk>
+**Maintainer**: Pratik Gupte <p.gupte24@imperial.ac.uk>
 ([ORCID](https://orcid.org/0000-0001-5294-7819))
+
+Authors:
+
+- Pratik Gupte <p.gupte24@imperial.ac.uk>
+  ([ORCID](https://orcid.org/0000-0001-5294-7819))
 
 Other contributors:
 
