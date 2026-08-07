@@ -9,6 +9,7 @@ make_materials(
   disease = "sars_cov_1",
   t0 = 30,
   horizon = 100,
+  final_horizon = horizon * 2,
   n_samples = 10,
   workshop_name = "Pandemic Response Workshop",
   date = as.character(Sys.Date()),
@@ -25,6 +26,10 @@ make_materials(
 \item{t0}{The current time-point. Defaults to 30 days.}
 
 \item{horizon}{The time horizon for projections. Defaults to 100 days.}
+
+\item{final_horizon}{The time horizon for the final phase of the exercise,
+when participants are shown projections under their chosen mitigation
+strategy. This should be a value > \code{horizon}, and defaults to 2x horizon.}
 
 \item{n_samples}{The number of samples for parameter uncertainty. Default 10.}
 

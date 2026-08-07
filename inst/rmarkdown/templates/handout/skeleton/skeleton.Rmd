@@ -17,7 +17,7 @@ output:
     fig_caption: true
     papersize: a4
     fontsize: 12pt
-    extra_dependencies: ["rotating", "booktabs"]
+    extra_dependencies: ["rotating", "booktabs", "float"]
 link-citations: true
 ---
 
@@ -28,7 +28,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   message = FALSE,
   warning = FALSE,
-  out.width = "70%"
+  out.width = "70%",
+  fig.pos = "H"
 )
 ```
 
@@ -82,61 +83,60 @@ t_diff <- horizon - t0
 # Explanation of the exercise
 
 You are a government advisor in **{{ country }}**.
-There is a global pandemic, and on day zero (see figure 1A) the first case is detected in {{ country }}.
+There is a global pandemic, and on day zero the first case is detected in {{ country }}; see **figure \@ref(fig:plot-explainer-01)**.
 
 On **day {{ t0 }}**, every table needs to make a decision:
 
 - Should we implement closures? 
 - Should we close businesses, while leaving schools open?
 - Or close both businesses and schools? Shall we implement this now, or on any day over the next **{{ t_diff }}** days?
-- You can choose amongst several strategies, ranging in stringency (see table 1).
+- You can choose from among several strategies, ranging in stringency (**see table \@ref(tbl:mitigation)**).
 
 The Imperial team presents you with projections of the health and economic outcomes of different strategies for the next {{ t_diff }} days.
 They use Imperial’s DAEDALUS model for the projections.
 Before the coffee break, your table needs to commit to one strategy, and note it down on the response strategy form. 
 
-There is considerable uncertainty surrounding the outcomes from each strategy (see figure 1B). 
+There is considerable uncertainty surrounding the outcomes from each strategy; see **figure \@ref(fig:plot-explainer-02)**. 
 
 After the coffee break, every table needs to briefly explain their chosen strategy.
 Our senior decision makers choose the strategy they want to implement.  
 
-On **Day {{ horizon }}**, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next 100 days.
+On **Day {{ horizon }}**, the Imperial team presents the outcomes from the chosen strategy, projecting outcomes for the next `r {{ final_horizon }} - {{ horizon }}` days; see **figure \@ref(fig:plot-explainer-03)**.
 The team also presents outcomes for one alternative strategy. 
 
 The workshop concludes with a discussion of the choices and the use of modelling in making tough trade-offs during early outbreaks.
 
-## Explanation of exercise timeline
-
-### Initial projections
-
 ```{r plot-explainer-01}
-#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
-#| shown below. Higher bars above values indicate that those values are more
-#| likely."
+#| fig.cap: "Timeline of the initial phase of this exercise. Participants
+#| are at day {{ t0 }} (red dashed line), after the first reported case.
+#| Epidemic outcomes, such as the number of daily detected cases shown here,
+#| depend upon policy choices: mainly, the implementation of mitigation
+#| strategies, including the time, duration, and stringency of implementation.
+#| Projections for potential outcomes are shown until a horizon of {{ horizon }}
+#| days (vertical grey dashed line)."
 
 knitr::include_graphics(
   file.path(figs_out, "plot_explainer_01.png")
 )
 ```
 
-### Uncertainty around outcomes under chosen response
-
 ```{r plot-explainer-02}
-#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
-#| shown below. Higher bars above values indicate that those values are more
-#| likely."
+#| fig.cap: "Uncertainty in projections in the initial phase of the exercise.
+#| Participants will see multiple curves for each mitigation strategy. Curves
+#| represent the range of possible outcomes for the epidemic. This uncertainty
+#| is due to uncertainty in the infection parameters, such as the $R_0$.
+#| A later figure explains how uncertainty is communicated in this handout."
 
 knitr::include_graphics(
   file.path(figs_out, "plot_explainer_02.png")
 )
 ```
 
-### Phase 2: Outcomes under chosen response
-
 ```{r plot-explainer-03}
-#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
-#| shown below. Higher bars above values indicate that those values are more
-#| likely."
+#| fig.cap: "Final phase of the exercise. Participants are at day {{ horizon }}
+#| and will see epidemic outcomes under the chosen mitigation strategy until
+#| {{ final_horizon }} days after the initial case, side-by-side with outcomes
+#| for an unmitigated outbreak."
 
 knitr::include_graphics(
   file.path(figs_out, "plot_explainer_03.png")
@@ -145,7 +145,11 @@ knitr::include_graphics(
 
 ## The Daedalus Model
 
-**TODO: ADD MODEL SCHEMATIC**
+```{r schematic}
+knitr::include_graphics(
+  "rmdchunks/schematic.png"
+)
+```
 
 DAEDALUS models infection transmissions within the community, the economy, and during travel between these places.
 
@@ -170,7 +174,7 @@ There is a circular loop, in that health, economic and education losses may inst
 See the online dashboard, [Daedalus Explore](https://daedalus.jameel-institute.org/scenarios/new).
 
 ```{r plot-r0-dist}
-#| fig.cap: "Distribution of R0. The true R0 cannot be known but is in the range
+#| fig.cap: "Distribution of $R_0$. The true $R_0$ cannot be known but is in the range
 #| shown below. Higher bars above values indicate that those values are more
 #| likely."
 
@@ -190,7 +194,7 @@ knitr::include_graphics(
 
 ## Mitigation strategies
 
-See table 2 in this handout for more information on economic productivity and workplace contacts.
+See table \@ref(tbl:sector-contacts) in this handout for more information on economic productivity and workplace contacts.
 
 ```{r inject-table, child="rmdchunks/table_mitigation.Rmd", echo=FALSE}
 ```
@@ -224,7 +228,7 @@ knitr::include_graphics(
 
 ## Projected epidemic outcomes for an unmitigated epidemic
 
-```{r}
+```{r plot-unmit-daily-cases}
 #| fig.cap: "Projections of daily new detected cases. Please consider that there
 #| may be under-ascertainment, i.e., not all cases may be detected and there
 #| may be more infections than detected cases."
@@ -234,7 +238,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-unmit-daily-hosp}
 #| fig.cap: "Projections of daily new hospital demand. Consider that there may
 #| be under-ascertainment, i.e., not all infections requiring hospital care may
 #| be detected. Hospital demand may be substantially greater
@@ -245,7 +249,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-unmit-total-hosp}
 #| fig.cap: "Projections of total hospital demand. This may be interpreted as
 #| hospital occupancy. Consider that there may be under-ascertainment, i.e., not
 #| all infections requiring hospital care may be detected. Hospital demand may
@@ -256,7 +260,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-unmit-daily-deaths}
 #| fig.cap: "Projections of daily deaths. Consider that there may be
 #| under-ascertaintment and not all deaths may be detected."
 
@@ -265,7 +269,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-unmit-epi-summary}
 #| fig.cap: "Projections of the cumulative numbers of detected cases and deaths
 #| by day {{ horizon }}. Shaded regions show the
 #| projection intervals."
@@ -275,7 +279,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-unmit-deaths-age}
 #| fig.cap: "Projections of the cumulative numbers of deaths by day
 #| {{ horizon }} sub-divided by the age-group affected. Shaded regions show
 #| projection intervals."
@@ -285,7 +289,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-unmit-gva-loss}
 #| fig.cap: "Cumulative economic losses by day {{ horizon }}."
 
 knitr::include_graphics(
@@ -295,28 +299,28 @@ knitr::include_graphics(
 
 ## Projected epidemic outcomes for mitigation scenarios
 
-```{r}
+```{r plot-scenarios-daily-cases}
 #| fig.cap: "Projected daily new detected cases."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_cases_square.png")
 )
 ```
 
-```{r}
+```{r plot-scenarios-daily-hosp}
 #| fig.cap: "Projected daily new hospital demand (admissions)."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_daily_hospitalisations_square.png")
 )
 ```
 
-```{r}
+```{r plot-scenarios-total-hosp}
 #| fig.cap: "Projected daily total hospital demand (occupancy)."
 knitr::include_graphics(
   file.path(figs_out, "plot_compare_total_hosp_square.png")
 )
 ```
 
-```{r}
+```{r plot-scenarios-daily-deaths}
 #| fig.cap: "Projected daily deaths."
 
 knitr::include_graphics(
@@ -324,7 +328,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-scenarios-epi-summary}
 #| fig.cap: "Projected cumulative detected cases and deaths by day
 #| {{ horizon }}."
 
@@ -333,7 +337,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-scenarios-deaths-age}
 #| fig.cap: "Projected cumulative detected deaths by day {{ horizon }} in each
 #| age group."
 
@@ -342,7 +346,7 @@ knitr::include_graphics(
 )
 ```
 
-```{r}
+```{r plot-scenarios-gva-loss}
 #| fig.cap: "Projected cumulative economic losses by day {{ horizon }}."
 
 knitr::include_graphics(
@@ -350,15 +354,11 @@ knitr::include_graphics(
 )
 ```
 
-# Section 3: Additional decision-making aids
+# Additional decision-making aids
 
-## GVA and contacts for each economic sector
-
-```{r sector_gva_contacts}
+```{r sector-contacts}
 make_sector_table(country, currency)
 ```
-
-## Risk of exceeding hospital capacity
 
 ```{r risk_hosp_overflow}
 make_hcap_breaches_table(tables_out)
@@ -366,19 +366,13 @@ make_hcap_breaches_table(tables_out)
 
 ## Median and limits of additional outcomes
 
-### Deaths by age group
-
 ```{r deaths_age_group}
 make_deaths_by_age_table(tables_out)
 ```
 
-### Domain-specific costs (millions {{ currency }})
-
 ```{r domain_specific_costs}
 make_domain_costs_table(tables_out, currency)
 ```
-
-### Economic costs due to closures and absences (millions {{ currency }})
 
 ```{r econ_costs_breakdown}
 make_econ_cost_table(tables_out, currency)

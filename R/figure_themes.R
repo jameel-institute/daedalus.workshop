@@ -26,16 +26,16 @@ theme_eppi <- function() {
 theme_explainer <- function() {
   ggplot2::theme_classic(base_size = 16) +
     ggplot2::theme(
-      axis.line.x = element_line(
+      axis.line.x = ggplot2::element_line(
         arrow = grid::arrow(
-          length = unit(0.3, "cm"),
+          length = ggplot2::unit(0.3, "cm"),
           ends = "last",
           type = "closed"
         )
       ),
-      axis.line.y = element_line(
+      axis.line.y = ggplot2::element_line(
         arrow = grid::arrow(
-          length = unit(0.3, "cm"),
+          length = ggplot2::unit(0.3, "cm"),
           ends = "last",
           type = "closed"
         )
