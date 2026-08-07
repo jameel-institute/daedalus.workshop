@@ -9,11 +9,11 @@
 Automate the generation of pandemic response workshop materials using the Daedalus family of packages.
 }
 \author{
-\strong{Maintainer}: Pratik Gupte \email{pratik.gupte@lshtm.ac.uk} (\href{https://orcid.org/0000-0001-5294-7819}{ORCID})
+\strong{Maintainer}: Pratik Gupte \email{p.gupte24@imperial.ac.uk} (\href{https://orcid.org/0000-0001-5294-7819}{ORCID})
 
 Authors:
 \itemize{
-  \item Pratik Gupte \email{pratik.gupte@lshtm.ac.uk} (\href{https://orcid.org/0000-0001-5294-7819}{ORCID})
+  \item Pratik Gupte \email{p.gupte24@imperial.ac.uk} (\href{https://orcid.org/0000-0001-5294-7819}{ORCID})
 }
 
 Other contributors:

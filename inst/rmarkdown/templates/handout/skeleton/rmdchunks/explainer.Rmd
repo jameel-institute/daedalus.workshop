@@ -179,7 +179,7 @@ explainer_infection <- withr::with_seed(
     }
 )
 
-horizon_new <- horizon * 2
+horizon_new <- final_horizon
 
 npi <- daedalus_timed_npi(
   t0, horizon_new, list(rep(0.9, 45)), country

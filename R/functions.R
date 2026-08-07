@@ -13,7 +13,7 @@
 #' @param t0 The current time-point. Defaults to 30 days.
 #'
 #' @param horizon The time horizon for projections. Defaults to 100 days.
-#' 
+#'
 #' @param final_horizon The time horizon for the final phase of the exercise,
 #' when participants are shown projections under their chosen mitigation
 #' strategy. This should be a value > `horizon`, and defaults to 2x horizon.
